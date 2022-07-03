@@ -9,21 +9,18 @@ import model.Professor;
 import model.Sala;
 import percistencia.AlunoPercistencia;
 import percistencia.ProfessorPercistencia;
-import percistencia.SalaPercistencia;
 import percistencia.TurmaPercistencia;
 
 public class TurmaServico {
 	private TurmaPercistencia tp;
 	private AlunoPercistencia ap;
 	private ProfessorPercistencia pp;
-	private SalaPercistencia sp;
 	
 		
 	public TurmaServico() {
 		tp = new TurmaPercistencia();
 		ap = new AlunoPercistencia();
-		pp = new ProfessorPercistencia();
-		sp = new SalaPercistencia();
+		pp = new ProfessorPercistencia();		
 		
 	}
 	
@@ -66,16 +63,26 @@ public class TurmaServico {
 		pp.atualizarProfessor(professor);				
 	}
 	
+	public void descastrarProfessor(Turma turma, Professor professor) {
+		turma.setProfessor(new Professor());
+		professor.getTurmasMinistradas().remove(turma);		
+		tp.atualizarTurma(turma);
+		pp.atualizarProfessor(professor);
+	}
+	
 	//cadastrarSala
 	public void cadastrarSala(Turma turma, Sala sala) throws InvalideFieldException {
-		validarTurma(turma);
 		turma.setSala(sala);
-		sp.atualizarTurma(sala);
 		tp.atualizarTurma(turma);				
 	}
 	
+	public void removerSala(Turma turma, Sala sala) {
+		turma.setSala(sala);
+		tp.atualizarTurma(turma);
+	}
+	
 	//matricular
-		public void matricularAluno(Aluno aluno,Turma turma) throws InvalideFieldException {
+		public void matricularAluno(Turma turma, Aluno aluno) throws InvalideFieldException {
 			validarTurma(turma);
 			turma.getAlunos().add(aluno);
 			aluno.getTurmasMatriculadas().add(turma);
@@ -83,6 +90,13 @@ public class TurmaServico {
 			ap.atualizarAluno(aluno);
 			
 		}	
+		
+		public void desmatricularAluno(Turma turma, Aluno aluno){		
+			aluno.getTurmasMatriculadas().remove(turma);
+			turma.getAlunos().remove(aluno);		
+			tp.atualizarTurma(turma);
+			ap.atualizarAluno(aluno);
+		}
 	//pegar
 	
 	//id
@@ -90,30 +104,18 @@ public class TurmaServico {
 		return tp.encontrarPeloId(id);		
 	}
 	//generico
-	private List<Turma> procurarTurmaPorCampo(String campo, String valor){		
-		ArrayList<Turma> resultadoConsultaTurmas = new ArrayList<Turma>();
-		resultadoConsultaTurmas.addAll(
-				tp.consultaSQL(
-						String.format(
-								"SELECT a FROM Turma a WHERE %s = '%s' ORDER BY %s",campo, valor,campo)));
-		resultadoConsultaTurmas.addAll(
-				tp.consultaSQL(
-						String.format("SELECT a FROM Turma a WHERE %s LIKE '%%%s%%' AND %s <> '%s' ORDER BY %s" ,
-								campo,valor,campo,valor,campo)));						
-		return resultadoConsultaTurmas;
-	}
-	
+		
 	
 	//diciplina
 	public List<Turma> procurarTurmaPorDiciplina(String diciplina){		
-		return procurarTurmaPorCampo("diciplina", diciplina);
+		return tp.consultarTurmaPorDiciplina(diciplina);
 	}
 	
 	
 
 	//horario
-	public List<Turma> procurarTurmaPorEmail(String horario){		
-		return procurarTurmaPorCampo("horario", horario);
+	public List<Turma> procurarTurmaPorHorario(String horario){		
+		return tp.consultarTurmaPorHorario(horario);
 	}
 	
 	

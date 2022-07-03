@@ -153,7 +153,7 @@ public class  AlunoPercistencia {
 	
 	//turmas
 	public List<Turma> listarTurmasDoId(int idAluno) {		
-		Aluno aluno = encontrarPeloId(idAluno);
+		Aluno aluno = encontrarPeloId(idAluno);		
         return (List<Turma>) aluno.getTurmasMatriculadas();
 		
 	}

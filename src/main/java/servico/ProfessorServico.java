@@ -1,6 +1,5 @@
 package servico;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import model.Professor;
@@ -46,78 +45,67 @@ public class ProfessorServico {
 		validarProfessor(professor);
 		professor.getTurmasMinistradas().add(turma);
 		turma.setProfessor(professor);
-		pp.atualizar(professor);
-		tp.atualizar(turma);
-	}	
-	
-	//criar
-	public void salvarProfessor(Professor professor) throws InvalideFieldException {
-		validarProfessor(professor);
-		pp.adicionarNovoAluno(professor);		
+		pp.atualizarProfessor(professor);
+		tp.atualizarTurma(turma);
 	}
 	
-	public void criarProfessor(String nome, int idade, String email, String formacao, Genero genero) throws InvalideFieldException {
+	public void desmatricularProfessor(Professor professor,Turma turma) {
+		professor.getTurmasMinistradas().remove(turma);
+		turma.setProfessor(new Professor());
+		pp.atualizarProfessor(professor);
+		tp.atualizarTurma(turma);
+		
+	}
+	
+	//criar
+	public void salvarNovoProfessor(Professor professor) throws InvalideFieldException {
+		validarProfessor(professor);	
+		pp.adicionarNovoProfessor(professor);
+	}
+	
+	public void salvarNovoProfessor(String nome, int idade, String email, String formacao, Genero genero) throws InvalideFieldException {
 		Professor professor = new Professor(nome, idade, email, formacao, genero);
-		salvarProfessor(professor);		
+		salvarNovoProfessor(professor);		
+	}
+	
+	///atualizar
+	public Professor atualizarProfessor(Professor professor) {
+		try {
+			validarProfessor(professor);
+			pp.atualizarProfessor(professor);
+			return professor;
+		}catch (InvalideFieldException e) {
+			return pp.encontrarPeloId(professor.getId());
+		}
+		
 	}
 	//pegar
 	
 	//id
 	public Professor procurarProfessorPorId(Integer id) {
 		return pp.encontrarPeloId(id);		
-	}
-	
-	public List<Professor> procurarProfessorPorCampo(String campo, String valor){		
-		ArrayList<Professor> resultadoConsultaSalas = new ArrayList<Professor>();
-		resultadoConsultaSalas.addAll(
-				pp.consultaSQL(
-						String.format(
-								"SELECT a FROM Professor a WHERE %s = '%s' ORDER BY %s",campo, valor,campo)));
-		resultadoConsultaSalas.addAll(
-				pp.consultaSQL(
-						String.format("SELECT a FROM Professor a WHERE %s LIKE '%%%s%%' AND %s <> '%s' ORDER BY %s" ,
-								campo,valor,campo,valor,campo)));						
-		return resultadoConsultaSalas;
-	}
+	}	
 	
 	//nome
-	public List<Professor> procurarProfessorPorNome(String nome){		
-		return procurarProfessorPorCampo("nome", nome);
+	public List<Professor> consultarProfessorPorNome(String nome) {
+		return pp.consultarProfessorPorNome(nome);
 	}
 	
 	//idade
-	public List<Professor> procurarProfessorPorIdade(int idade){		
-		ArrayList<Professor> resultadoConsultaProfessors = new ArrayList<Professor>();
-		resultadoConsultaProfessors.addAll(
-				pp.consultaSQL(
-						String.format(
-								"SELECT a FROM Professor a WHERE idade = '%d' ORDER BY nome",idade)));					
-		return resultadoConsultaProfessors;
+	public List<Professor> consultarProfessorPorIdade(int idade) {
+		return pp.consultarProfessorPorIdade(idade);
 	}
 
 	//email
-	public List<Professor> procurarProfessorPorEmail(String email){		
-		return procurarProfessorPorCampo("email", email);
+	public List<Professor> consultarProfessorPorEmail(String email) {
+		return pp.consultarProfessorPorEmail(email);
+		
 	}
-	
-	//curso
-	public List<Professor> procurarProfessorPorFormacao(String formacao){		
-		return procurarProfessorPorCampo("formacao", formacao);
-	}	
-	//genero
-	public List<Professor> procurarProfessorPorCurso(Genero genero){		
-		ArrayList<Professor> resultadoConsultaProfessors = new ArrayList<Professor>();
-		resultadoConsultaProfessors.addAll(
-				pp.consultaSQL(
-						String.format(
-								"SELECT a FROM Professor a WHERE genero = '%s' ORDER BY nome",genero.toString())));
-		return resultadoConsultaProfessors;
+	//formacao
+	public List<Professor> consultarProfessorPorFormacao(String formacao) {
+		return pp.consultarProfessorPorFormacao(formacao);
+		
 	}
-	//turmas
-	public List<Turma> listarTurmaMatriculadaDeProfessor(Professor professor){		
-		List<Turma> resultadoConsultaTurmas = pp.listarTurmasDoId(professor.getId());					
-		return resultadoConsultaTurmas;
-	}	
 	
 	//listar
 	public List<Professor> listarProfessors() {
@@ -126,7 +114,7 @@ public class ProfessorServico {
 	
 	//deletar
 	public void deletarProfessor(Professor professor) {
-		pp.delete(professor.getId());
+		pp.deletarProfessorPorId(professor.getId());
 	}
 	
 

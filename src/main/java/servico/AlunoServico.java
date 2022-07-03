@@ -44,7 +44,7 @@ public class AlunoServico {
 	}
 	
 	//matricular
-	public void matricularAluno(Aluno aluno,Turma turma) throws InvalideFieldException {
+	public void matricularTurma(Aluno aluno,Turma turma) throws InvalideFieldException {
 		validarAluno(aluno);
 		aluno.getTurmasMatriculadas().add(turma);
 		turma.getAlunos().add(aluno);
@@ -52,14 +52,24 @@ public class AlunoServico {
 		tp.atualizarTurma(turma);
 	}	
 	
-	//criar
-	private void salvarAluno(Aluno aluno) throws InvalideFieldException {
-		validarAluno(aluno);
-		if (ap.getAlunos().contains(aluno)) {
+	//desmatricular aluno
+	public void desmatricularTurma(Aluno aluno,Turma turma){		
+		aluno.getTurmasMatriculadas().remove(turma);
+		turma.getAlunos().remove(aluno);		
+		tp.atualizarTurma(turma);
+		ap.atualizarAluno(aluno);
+	}
+			
+	//atualizar
+	public Aluno atualizarAluno(Aluno aluno) {
+		try {
+			validarAluno(aluno);
 			ap.atualizarAluno(aluno);
-		}else {
-			ap.adicionarNovoAluno(aluno);	
-		}
+			return aluno;
+		} catch (InvalideFieldException e) {
+			Aluno novo = ap.encontrarPeloId(aluno.getId());
+			return novo;
+		}		
 	}
 	
 	public void salvarNovoAluno(String nome, int idade, String email, String curso, String matricula, Genero genero) throws InvalideFieldException {
@@ -68,7 +78,8 @@ public class AlunoServico {
 	}
 	
 	public void salvarNovoAluno(Aluno aluno) throws InvalideFieldException {
-		salvarAluno(aluno);
+		validarAluno(aluno);		
+		ap.adicionarNovoAluno(aluno);
 	}
 	//pegar
 	

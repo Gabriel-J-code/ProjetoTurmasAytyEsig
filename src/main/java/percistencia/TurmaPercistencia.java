@@ -87,14 +87,7 @@ public class  TurmaPercistencia {
 			encontrada = em.find(Turma.class, id);
 		}
 		return encontrada;
-	}
-	public List<Turma> consultaSQL(String sql) {
-		abrir();
-		@SuppressWarnings("unchecked")
-		List<Turma> Turmas = em.createQuery(sql).getResultList();
-		fechar();
-		return Turmas;
-	}
+	}	
 	
 	private List<Turma> consultarTurmaPorCampo(String campo, String valor) {
 		List<Turma> resultadoConsultaTurmas = new ArrayList<Turma>();

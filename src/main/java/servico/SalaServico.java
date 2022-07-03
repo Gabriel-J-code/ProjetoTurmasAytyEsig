@@ -1,6 +1,5 @@
 package servico;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import model.Sala;
@@ -33,14 +32,24 @@ public class SalaServico {
 		
 	
 	//criar
-	public void salvarSala(Sala sala) throws InvalideFieldException {
+	public void salvarNovaSala(Sala sala) throws InvalideFieldException {
 		validarSala(sala);
-		sp.adicionarNovaTurma(sala);		
+		sp.adicionarNovaSala(sala);		
 	}
 	
-	public void criarSala(String numero, String predio, String campus) throws InvalideFieldException {
+	public void salvarNovaSala(String numero, String predio, String campus) throws InvalideFieldException {
 		Sala sala = new Sala(numero, predio, campus);
-		salvarSala(sala);		
+		salvarNovaSala(sala);		
+	}
+	
+	public Sala atualizarSala(Sala sala) {
+		try {
+			validarSala(sala);
+			sp.atualizarSala(sala);
+			return sala;
+		} catch (InvalideFieldException e) {
+			return sp.encontrarSalaPeloId(sala.getId());
+		}		
 	}
 	//pegar
 	
@@ -48,31 +57,18 @@ public class SalaServico {
 	public Sala procurarSalaPorId(Integer id) {
 		return sp.encontrarSalaPeloId(id);		
 	}
-	
-	public List<Sala> procurarSalaPorCampo(String campo, String valor){		
-		ArrayList<Sala> resultadoConsultaSalas = new ArrayList<Sala>();
-		String campoLC = campo.toLowerCase();
-		resultadoConsultaSalas.addAll(
-				sp.consultaSQL(
-						String.format(
-								"SELECT a FROM Sala a WHERE %s = '%s' ORDER BY %s",campoLC, valor,campoLC)));
-		resultadoConsultaSalas.addAll(
-				sp.consultaSQL(
-						String.format("SELECT a FROM Sala a WHERE %s LIKE '%%%s%%' AND %s <> '%s' ORDER BY %s" ,
-								campoLC,valor,campoLC,valor,campoLC)));						
-		return resultadoConsultaSalas;
-	}
+		
 	//numero
 	public List<Sala> procurarSalaPorNumero(String numero){		
-		return procurarSalaPorCampo("numero", numero);
+		return sp.contultarSalaPorNumero(numero);
 	}
 	//predio
 	public List<Sala> procurarSalaPorPredio(String predio){		
-		return procurarSalaPorCampo("predio", predio);
+		return sp.contultarSalaPorPredio(predio);
 	}
 	//campus
 	public List<Sala> procurarSalaPorCampus(String campus){		
-		return procurarSalaPorCampo("campus", campus);
+		return sp.contultarSalaPorCampus(campus);
 	}	
 	
 	//listar

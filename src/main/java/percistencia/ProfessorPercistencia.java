@@ -81,16 +81,16 @@ public class  ProfessorPercistencia {
 	//LER
 	//todos
 	
-	public static List<Professor> getProfessores() {				
+	public List<Professor> getProfessores() {				
 		return professores;
 	}
 	//por id
 	public Professor encontrarPeloId(int id) {
-		Professor encotrado = null;
+		Professor encontrado = null;
 		if (em.isOpen()) {
-			encotrado = em.find(Professor.class, id);
+			encontrado = em.find(Professor.class, id);
 		}
-		return encotrado;
+		return encontrado;
 	}
 	
 	private List<Professor> consultarProfessorPorCampo(String campo, String valor) {
@@ -116,11 +116,11 @@ public class  ProfessorPercistencia {
 		return resultadoConsultaProfessores;
 	}
 	
-	public List<Professor> procurarProfessorPorNome(String nome){		
+	public List<Professor> consultarProfessorPorNome(String nome){		
 		return consultarProfessorPorCampo("nome", nome);
 	}
 	
-	public List<Professor> procurarProfessorPorIdade(int idade){		
+	public List<Professor> consultarProfessorPorIdade(int idade){		
 		ArrayList<Professor> resultadoConsultaProfessores = new ArrayList<Professor>();
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Professor> criteria = cb.createQuery(Professor.class);

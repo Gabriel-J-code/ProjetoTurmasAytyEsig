@@ -51,11 +51,8 @@
 				value="#{alunoCon.alunoFoco.genero}" >
 				<f:selectItems value="#{alunoCon.generos()}"
 				 var="g" itemLabel="#{g.descricao}"/></h:selectOneRadio>
-			<h:message for="genero"/>	
-			
-				
+			<h:message for="genero"/>		
 		</h:panelGrid>
-		
 
 		<h:commandButton value="Salvar"
 			action="#{alunoCon.salvarNovoAluno()}" />
