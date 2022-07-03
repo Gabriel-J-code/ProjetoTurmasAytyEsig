@@ -5,31 +5,55 @@ package percistencia;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+import javax.enterprise.event.Observes;
+import javax.enterprise.event.Reception;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
+import model.Aluno;
 import model.Professor;
 import model.Turma;
 
 public class  ProfessorPercistencia {
 	
+	private static List<Professor> professores = new ArrayList<Professor>();
+	
 	private static EntityManagerFactory emf;
 	private static EntityManager em;
 	
 	static {
-		try {
-			emf = Persistence.createEntityManagerFactory("turmasAyty");
+		try {			
+			emf = Persistence.createEntityManagerFactory("TurmasAytyEsig");
+			em = emf.createEntityManager();
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
 	}
 	
-	public ProfessorPercistencia() {		
-		em = emf.createEntityManager();
+	public ProfessorPercistencia() {			
 		abrir();
 	}
 	
+	public void onListaProfessoresChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Professor professor) {
+        pegarProfessoresOrdenadosPorNome();
+    }	
+	
+	private void pegarProfessoresOrdenadosPorNome() {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Professor> criteria = cb.createQuery(Professor.class);
+        Root<Professor> professor = criteria.from(Professor.class);
+        // Swap criteria statements if you would like to try out type-safe criteria queries, a new
+        // feature in JPA 2.0
+        // criteria.select(member).orderBy(cb.asc(member.get(Aluno_.name)));
+        criteria.select(professor).orderBy(cb.asc(professor.get("nome")));
+       professores = em.createQuery(criteria).getResultList();
+		
+	}
 	private ProfessorPercistencia abrir() {
 		em.getTransaction().begin();		
 		return this;
@@ -41,22 +65,17 @@ public class  ProfessorPercistencia {
 	}
 	
 	//Criar
-	public ProfessorPercistencia create(Professor entidade) {
+	public ProfessorPercistencia adicionarNovoProfessor(Professor professor) {
 		if (em.isOpen()) {
-			em.persist(entidade);
+			em.persist(professor);
 		}
 		return this;
 	}
 	
 	//LER
 	//todos
-	@SuppressWarnings("unchecked")
-	public List<Professor> getProfessores() {			
-		List<Professor> professores = null;
-		if (!em.isOpen()) {	
-			professores = em.createQuery("SELECT p FROM Professor p").getResultList();
-		}		
-		
+	
+	public static List<Professor> getProfessores() {				
 		return professores;
 	}
 	//por id
@@ -97,6 +116,8 @@ public class  ProfessorPercistencia {
 		Professor professor = encontrarPeloId(idProfessor);
 		return (List<Turma>) professor.getTurmasMinistradas();
 	}
+
+	
 	
 		
 }

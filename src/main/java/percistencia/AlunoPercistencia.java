@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.enterprise.event.Observes;
 import javax.enterprise.event.Reception;
 import javax.persistence.EntityManager;
@@ -21,30 +22,32 @@ import model.Turma;
 
 public class  AlunoPercistencia {
 	
-	private List<Aluno> alunos = new ArrayList<Aluno>();
-	
+	private static List<Aluno> alunos = new ArrayList<Aluno>();
+		
 	private static EntityManagerFactory emf;
 	private static EntityManager em;
 	
 	static {
-		try {
+		try {			
 			emf = Persistence.createEntityManagerFactory("TurmasAytyEsig");
-			em = emf.createEntityManager();	
+			em = emf.createEntityManager();
+			
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
 	}
-	
+		
 	public AlunoPercistencia() {	
 		abrir();
+		pegarAlunosOrdenadosPorNome();
 	}
 	
 	public void onListaAlunosChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Aluno aluno) {
         pegarAlunosOrdenadosPorNome();
     }
-	
-	@PostConstruct
+		
 	private void pegarAlunosOrdenadosPorNome() {
+		
 		CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Aluno> criteria = cb.createQuery(Aluno.class);
         Root<Aluno> aluno = criteria.from(Aluno.class);
@@ -52,25 +55,34 @@ public class  AlunoPercistencia {
         // feature in JPA 2.0
         // criteria.select(member).orderBy(cb.asc(member.get(Aluno_.name)));
         criteria.select(aluno).orderBy(cb.asc(aluno.get("nome")));
-       alunos = em.createQuery(criteria).getResultList();
-		
+       alunos = em.createQuery(criteria).getResultList(); 		
 	}
 
 	private AlunoPercistencia abrir() {
 		em.getTransaction().begin();
 		return this;
 	}
-	
+	@PreDestroy
 	public AlunoPercistencia fechar() {
+		
 		em.getTransaction().commit();
 		return this;
 	}
 	
 	//Criar
-	public AlunoPercistencia create(Aluno entidade) {
-		if (em.isOpen()) {
-			em.persist(entidade);
+	public AlunoPercistencia create(Aluno aluno) {
+		try {
+			em.getTransaction().begin();
+			em.persist(aluno);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			em.getTransaction().rollback();
+		}finally {
+			pegarAlunosOrdenadosPorNome();
 		}
+		
+			
+		
 		return this;
 	}
 	
@@ -85,16 +97,7 @@ public class  AlunoPercistencia {
 		return encotrado;
 	}
 	
-	//
-	/*CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Aluno> criteria = cb.createQuery(Aluno.class);
-        Root<Aluno> aluno = criteria.from(Aluno.class);
-        // Swap criteria statements if you would like to try out type-safe criteria queries, a new
-        // feature in JPA 2.0
-        // criteria.select(member).orderBy(cb.asc(member.get(Aluno_.name)));
-        criteria.select(aluno).orderBy(cb.asc(aluno.get("name")));
-       alunos = em.createQuery(criteria).getResultList();
-	   */
+	//	
 	//busca por campo
 	private List<Aluno> consultarAlunoPorCampo(String campo, String valor){
 		ArrayList<Aluno> resultadoConsultaAlunos = new ArrayList<Aluno>();
@@ -162,17 +165,32 @@ public class  AlunoPercistencia {
 	//Atualizar
 	public Aluno atualizar(Aluno aluno) {
 		Aluno a = null;
-		if (em.isOpen()) {		
-			a = em.merge(aluno);		
-		}		
+			try {
+				em.getTransaction().begin();
+				a = em.merge(aluno);
+				 em.getTransaction().commit();
+			} catch (Exception e) {
+				 em.getTransaction().rollback();
+			}finally {
+				pegarAlunosOrdenadosPorNome();
+				
+			}		
+					
+				
 		return a;
 	}
 	//Deletar
 	public AlunoPercistencia delete(int id) {
-		if (em.isOpen()) {
+		try {
+			em.getTransaction().begin();
 			AlunoPercistencia dao = new AlunoPercistencia();
 			Aluno obj = dao.encontrarPeloId(id);
 			em.remove(em.contains(obj) ? obj : em.merge(obj));
+			em.getTransaction().commit();
+		}catch (Exception e) {
+			em.getTransaction().rollback();
+		}finally {			
+			pegarAlunosOrdenadosPorNome();
 		}
 		return this;
 	}

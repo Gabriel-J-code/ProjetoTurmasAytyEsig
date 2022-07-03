@@ -53,17 +53,21 @@ public class AlunoServico {
 	}	
 	
 	//criar
-	public void salvarAluno(Aluno aluno) throws InvalideFieldException {
+	private void salvarAluno(Aluno aluno) throws InvalideFieldException {
 		validarAluno(aluno);
-		ap.create(aluno);		
+		if (ap.getAlunos().contains(aluno)) {
+			ap.atualizar(aluno);
+		}else {
+			ap.create(aluno);	
+		}
 	}
 	
-	public void criarAluno(String nome, int idade, String email, String curso, String matricula, Genero genero) throws InvalideFieldException {
+	public void salvarNovoAluno(String nome, int idade, String email, String curso, String matricula, Genero genero) throws InvalideFieldException {
 		Aluno aluno = new Aluno(nome, idade, email, curso, matricula, genero);
-		criarAluno(aluno);		
+		salvarNovoAluno(aluno);		
 	}
 	
-	public void criarAluno(Aluno aluno) throws InvalideFieldException {
+	public void salvarNovoAluno(Aluno aluno) throws InvalideFieldException {
 		salvarAluno(aluno);
 	}
 	//pegar

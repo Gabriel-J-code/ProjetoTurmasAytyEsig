@@ -60,6 +60,20 @@
 		    <artifactId>jaxb-api</artifactId>
 		    <version>2.3.1</version>
 		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/com.sun.faces/jsf-api -->
+		<dependency>
+		    <groupId>com.sun.faces</groupId>
+		    <artifactId>jsf-api</artifactId>
+		    <version>2.2.20</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/javax.servlet/jstl -->
+		<dependency>
+		    <groupId>javax.servlet</groupId>
+		    <artifactId>jstl</artifactId>
+		    <version>1.2</version>
+		</dependency>
 
 	</dependencies>
   <build>

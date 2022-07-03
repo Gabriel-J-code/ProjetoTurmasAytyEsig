@@ -8,14 +8,16 @@
 		@IMPORT url(estilo.css);
 		</style>
 </h:head> <h:body>
-	<h1>Cadastro de Alunos</h1>
+	<h:head></h:head> 
+<body> 
+<h1>Cadastro de Aluno</h1>
 	<h:form>
 		<h:messages />
 		<h:panelGrid columnClasses="titleCamp, inputCamp, messageCamp"  columns="3">
 		
 			<h:outputLabel for="nome" value="Nome: " />
 			<h:inputText id="nome"
-				value="#{alunoCon.alunoFoco.nome}  {alunoCon.alunoFoco.nome}" />
+				value="#{alunoCon.alunoFoco.nome}" />
 			<h:message for="name"/>
 		
 			<h:outputLabel for="idade" value="Idade: " /> 
@@ -47,19 +49,19 @@
 			<h:outputLabel for="genero" value="Genero: " />	
 			<h:selectOneRadio id="genero"  required="true"
 				value="#{alunoCon.alunoFoco.genero}" >
-				<f:selectItems value="#{alunoCon.generos}"
+				<f:selectItems value="#{alunoCon.generos()}"
 				 var="g" itemLabel="#{g.descricao}"/></h:selectOneRadio>
 			<h:message for="genero"/>		
 		</h:panelGrid>
 
 		<h:commandButton value="Salvar"
-			action="#{alunoConsalvaAluno}" />
+			action="#{alunoCon.salvarNovoAluno()}" />
 		<h:commandButton value="Cancelar"
 			action="#{alunoCon.novoAluno()}" immediate="true" />
 		<br />
 	</h:form>
 	<h:form>
-		<h:dataTable value="#{alunoConalunos}" var="a"
+		<h:dataTable value="#{alunoCon.alunos}" var="a"
 			rowClasses="linha1, linha2">
 			<h:column>
 				<f:facet name="header">id</f:facet>
@@ -101,4 +103,5 @@
 			</h:column>
 		</h:dataTable>
 	</h:form>
+	</body>
 </h:body> </html>

@@ -57,8 +57,7 @@ public class Aluno implements Serializable {
 	@Column(unique = true)
 	private String matricula;
 	
-	@NotNull(message = "Não pode ser nulo!")
-	@NotEmpty(message = "Não pode esta vazio!")
+	@NotNull
 	@Enumerated(EnumType.STRING)
 	private Genero genero;
 	

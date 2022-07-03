@@ -14,7 +14,6 @@
 			<property name="hibernate.connection.username" value="Gabriel"/>
 			<property name="hibernate.connection.password" value="myGab13"/>
 			<property name="hibernate.connection.url" value="jdbc:mysql://&lt;hostname&gt;/&lt;database&gt;"/>
-			<property name="hibernate.hbm2ddl.auto" value="create"/>		
 			<property name="hibernate.generate_statistics" value="true"/>	
 		</properties>
 	</persistence-unit>

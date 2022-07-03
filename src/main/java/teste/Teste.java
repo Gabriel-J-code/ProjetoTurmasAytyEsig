@@ -31,17 +31,7 @@ public class Teste {
 		
 		
 		AlunoServico as = new AlunoServico();
-		
-		Aluno gabrielDeJesus = new Aluno("Gabriel de Jesus", 24, "Gabriel@mail.com", "LCC", "20190000000", Genero.M);
-		Aluno ArthurGabriel = new Aluno("Arthur Gabriel", 30, "Arthur@mail.com", "SI", "20210000000", Genero.M);
-		try {
-			as.criarAluno("Gabriel de Jesus", 24, "Gabriel@mail.com", "LCC", "20190000000", Genero.M);
-			as.criarAluno("Arthur Gabriel", 30, "Arthur@mail.com", "SI", "20210000000", Genero.M);
-		} catch (InvalideFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+				
 		List<Aluno> alunos = as.procurarAlunoPorNome("Gabriel");
 		for (Aluno aluno : alunos) {			
 			System.out.println(aluno.toString());
