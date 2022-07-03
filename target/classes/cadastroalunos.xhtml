@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"> <h:head>
+	<title>Cadastro Aluno </title>
+	<style>
+		@IMPORT url(estilo.css);
+		</style>
+</h:head> <h:body>
+	<h1>Cadastro de Alunos</h1>
+	<h:form>
+		<h:messages />
+		<h:panelGrid columnClasses="titleCamp, inputCamp, messageCamp"  columns="3">
+		
+			<h:outputLabel for="nome" value="Nome: " />
+			<h:inputText id="nome"
+				value="#{alunoCon.alunoFoco.nome}  {alunoCon.alunoFoco.nome}" />
+			<h:message for="name"/>
+		
+			<h:outputLabel for="idade" value="Idade: " /> 
+			<h:inputText id="idade"
+				value="#{alunoCon.alunoFoco.idade}"> 
+				<f:convertNumber integerOnly="true" minIntegerDigits="0"/></h:inputText>
+			<h:message for="name"/>
+		
+			<h:outputLabel for="email" value="Email: " /> 
+			<h:inputText id="email"
+				value="#{alunoCon.alunoFoco.email}"
+				validatorMessage=" Email Invalido!">
+				<f:validateRegex pattern=".+@.+"></f:validateRegex> </h:inputText> 
+			<h:message for="email" />
+		
+		
+		
+			<h:outputLabel for="curso" value="Curso: " />
+				<h:inputText id="curso"
+					value="#{alunoCon.alunoFoco.curso}" />
+				<h:message for="curso"/>			
+				
+			<h:outputLabel for="matricula" value="Matricula: " />
+				<h:inputText id="matricula"
+					value="#{alunoCon.alunoFoco.matricula}" />
+				<h:message for="matricula"/>
+			
+	
+			<h:outputLabel for="genero" value="Genero: " />	
+			<h:selectOneRadio id="genero"  required="true"
+				value="#{alunoCon.alunoFoco.genero}" >
+				<f:selectItems value="#{alunoCon.generos}"
+				 var="g" itemLabel="#{g.descricao}"/></h:selectOneRadio>
+			<h:message for="genero"/>		
+		</h:panelGrid>
+
+		<h:commandButton value="Salvar"
+			action="#{alunoConsalvaAluno}" />
+		<h:commandButton value="Cancelar"
+			action="#{alunoCon.novoAluno()}" immediate="true" />
+		<br />
+	</h:form>
+	<h:form>
+		<h:dataTable value="#{alunoConalunos}" var="a"
+			rowClasses="linha1, linha2">
+			<h:column>
+				<f:facet name="header">id</f:facet>
+				#{a.id}
+			</h:column>
+			<h:column>
+				<f:facet name="header">Nome</f:facet>
+				#{a.nome}
+			</h:column>
+			<h:column>
+				<f:facet name="header">Idade</f:facet>
+				#{a.idade}
+			</h:column>
+			<h:column>
+				<f:facet name="header">Email</f:facet>
+				#{a.email}
+			</h:column>
+			<h:column>
+				<f:facet name="header">Matricula</f:facet>
+				#{a.matricula}
+			</h:column>
+			<h:column>
+				<f:facet name="header">Genero</f:facet>
+				#{a.genero}
+			</h:column>
+			<h:column>
+				<f:facet name="header">Ações</f:facet>
+				<h:commandLink value="Editar">
+					<f:setPropertyActionListener value="#{a}"
+						target="#{alunoCon.alunoFoco}">
+					</f:setPropertyActionListener>
+				</h:commandLink> |<!-- action="" -->
+				<h:commandLink value="Excluir"
+					action="#{alunoCon.excluirAluno}">
+					<f:setPropertyActionListener value="#{a}"
+						target="#{alunoCon.alunoFoco}">
+					</f:setPropertyActionListener>
+				</h:commandLink>
+			</h:column>
+		</h:dataTable>
+	</h:form>
+</h:body> </html>

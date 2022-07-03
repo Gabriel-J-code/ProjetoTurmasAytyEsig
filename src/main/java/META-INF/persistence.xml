@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.2" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
+	<persistence-unit name="TurmasAytyEsig" transaction-type="JTA">
+		<jta-data-source>java:/MySqlDS</jta-data-source>
+		<class>model.Aluno</class>
+		<class>model.Professor</class>
+		<class>model.Turma</class>
+		<class>model.Sala</class>
+		<shared-cache-mode>ALL</shared-cache-mode>
+		<validation-mode>AUTO</validation-mode>
+		<properties>
+			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect"/>
+			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
+			<property name="hibernate.connection.username" value="Gabriel"/>
+			<property name="hibernate.connection.password" value="myGab13"/>
+			<property name="hibernate.connection.url" value="jdbc:mysql://&lt;hostname&gt;/&lt;database&gt;"/>
+			<property name="hibernate.hbm2ddl.auto" value="create"/>		
+			<property name="hibernate.generate_statistics" value="true"/>	
+		</properties>
+	</persistence-unit>
+</persistence>
