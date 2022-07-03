@@ -4,8 +4,6 @@ package percistencia;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.enterprise.event.Observes;
 import javax.enterprise.event.Reception;
 import javax.persistence.EntityManager;
@@ -62,7 +60,7 @@ public class  AlunoPercistencia {
 		em.getTransaction().begin();
 		return this;
 	}
-	@PreDestroy
+	
 	public AlunoPercistencia fechar() {
 		
 		em.getTransaction().commit();
@@ -70,7 +68,7 @@ public class  AlunoPercistencia {
 	}
 	
 	//Criar
-	public AlunoPercistencia create(Aluno aluno) {
+	public AlunoPercistencia adicionarNovoAluno(Aluno aluno) {
 		try {
 			em.getTransaction().begin();
 			em.persist(aluno);
@@ -80,8 +78,6 @@ public class  AlunoPercistencia {
 		}finally {
 			pegarAlunosOrdenadosPorNome();
 		}
-		
-			
 		
 		return this;
 	}
@@ -163,7 +159,7 @@ public class  AlunoPercistencia {
 	}
 	
 	//Atualizar
-	public Aluno atualizar(Aluno aluno) {
+	public Aluno atualizarAluno(Aluno aluno) {
 		Aluno a = null;
 			try {
 				em.getTransaction().begin();
@@ -173,18 +169,15 @@ public class  AlunoPercistencia {
 				 em.getTransaction().rollback();
 			}finally {
 				pegarAlunosOrdenadosPorNome();
-				
-			}		
-					
-				
+			}				
 		return a;
+			
 	}
 	//Deletar
-	public AlunoPercistencia delete(int id) {
+	public AlunoPercistencia deletarAlunoPorId(int id) {
 		try {
 			em.getTransaction().begin();
-			AlunoPercistencia dao = new AlunoPercistencia();
-			Aluno obj = dao.encontrarPeloId(id);
+			Aluno obj = encontrarPeloId(id);
 			em.remove(em.contains(obj) ? obj : em.merge(obj));
 			em.getTransaction().commit();
 		}catch (Exception e) {

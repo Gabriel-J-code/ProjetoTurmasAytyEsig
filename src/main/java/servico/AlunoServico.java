@@ -48,17 +48,17 @@ public class AlunoServico {
 		validarAluno(aluno);
 		aluno.getTurmasMatriculadas().add(turma);
 		turma.getAlunos().add(aluno);
-		ap.atualizar(aluno);
-		tp.atualizar(turma);
+		ap.atualizarAluno(aluno);
+		tp.atualizarTurma(turma);
 	}	
 	
 	//criar
 	private void salvarAluno(Aluno aluno) throws InvalideFieldException {
 		validarAluno(aluno);
 		if (ap.getAlunos().contains(aluno)) {
-			ap.atualizar(aluno);
+			ap.atualizarAluno(aluno);
 		}else {
-			ap.create(aluno);	
+			ap.adicionarNovoAluno(aluno);	
 		}
 	}
 	
@@ -117,7 +117,7 @@ public class AlunoServico {
 	
 	//deletar
 	public void deletarAluno(Aluno aluno) {
-		ap.delete(aluno.getId());
+		ap.deletarAlunoPorId(aluno.getId());
 	}
 	
 

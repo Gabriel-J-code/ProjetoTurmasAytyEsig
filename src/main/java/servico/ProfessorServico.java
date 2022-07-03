@@ -53,7 +53,7 @@ public class ProfessorServico {
 	//criar
 	public void salvarProfessor(Professor professor) throws InvalideFieldException {
 		validarProfessor(professor);
-		pp.create(professor);		
+		pp.adicionarNovoAluno(professor);		
 	}
 	
 	public void criarProfessor(String nome, int idade, String email, String formacao, Genero genero) throws InvalideFieldException {

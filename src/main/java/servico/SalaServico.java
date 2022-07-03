@@ -35,7 +35,7 @@ public class SalaServico {
 	//criar
 	public void salvarSala(Sala sala) throws InvalideFieldException {
 		validarSala(sala);
-		sp.create(sala);		
+		sp.adicionarNovaTurma(sala);		
 	}
 	
 	public void criarSala(String numero, String predio, String campus) throws InvalideFieldException {
@@ -46,7 +46,7 @@ public class SalaServico {
 	
 	//id
 	public Sala procurarSalaPorId(Integer id) {
-		return sp.encontrarPeloId(id);		
+		return sp.encontrarSalaPeloId(id);		
 	}
 	
 	public List<Sala> procurarSalaPorCampo(String campo, String valor){		
@@ -82,7 +82,7 @@ public class SalaServico {
 	
 	//deletar
 	public void deletarSala(Sala sala) {
-		sp.delete(sala.getId());
+		sp.deleteSalaProId(sala.getId());
 	}
 	
 

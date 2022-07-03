@@ -5,7 +5,6 @@ package percistencia;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.event.Observes;
 import javax.enterprise.event.Reception;
 import javax.persistence.EntityManager;
@@ -15,7 +14,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import model.Aluno;
+import model.Genero;
 import model.Professor;
 import model.Turma;
 
@@ -37,6 +36,7 @@ public class  ProfessorPercistencia {
 	
 	public ProfessorPercistencia() {			
 		abrir();
+		pegarProfessoresOrdenadosPorNome();
 	}
 	
 	public void onListaProfessoresChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Professor professor) {
@@ -66,8 +66,14 @@ public class  ProfessorPercistencia {
 	
 	//Criar
 	public ProfessorPercistencia adicionarNovoProfessor(Professor professor) {
-		if (em.isOpen()) {
+		try {
+			abrir();
 			em.persist(professor);
+			fechar();
+		} catch (Exception e) {
+			em.getTransaction().rollback();
+		}finally {
+			pegarProfessoresOrdenadosPorNome();;
 		}
 		return this;
 	}
@@ -80,42 +86,106 @@ public class  ProfessorPercistencia {
 	}
 	//por id
 	public Professor encontrarPeloId(int id) {
-		Professor encotrado = new Professor();
+		Professor encotrado = null;
 		if (em.isOpen()) {
 			encotrado = em.find(Professor.class, id);
 		}
 		return encotrado;
 	}
-	@SuppressWarnings("unchecked")
-	public List<Professor> consultaSQL(String sql) {
-		List<Professor> professores = new ArrayList<Professor>();
-		if (em.isOpen()) {		
-			professores = em.createQuery(sql).getResultList();
-		}
-		return professores;
+	
+	private List<Professor> consultarProfessorPorCampo(String campo, String valor) {
+		List<Professor> resultadoConsultaProfessores = new ArrayList<Professor>();
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Professor> criteria = cb.createQuery(Professor.class);
+		Root<Professor> professor = criteria.from(Professor.class);
+		criteria.select(professor)
+			.where(cb.equal(professor.get(campo),valor))
+			.orderBy(cb.asc(professor.get(campo)));
+		resultadoConsultaProfessores.addAll(em.createQuery(criteria).getResultList());
+		
+	    criteria.select(professor)
+	    	.where(cb.like(professor.get(campo), valor + "%"))
+	    	.orderBy(cb.asc(professor.get(campo)));
+	    resultadoConsultaProfessores.addAll(em.createQuery(criteria).getResultList());
+	    
+	    criteria.select(professor)
+	    	.where(cb.like(professor.get(campo), "%" + valor + "%"))
+	    	.orderBy(cb.asc(professor.get(campo)));
+	    resultadoConsultaProfessores.addAll(em.createQuery(criteria).getResultList());
+		
+		return resultadoConsultaProfessores;
+	}
+	
+	public List<Professor> procurarProfessorPorNome(String nome){		
+		return consultarProfessorPorCampo("nome", nome);
+	}
+	
+	public List<Professor> procurarProfessorPorIdade(int idade){		
+		ArrayList<Professor> resultadoConsultaProfessores = new ArrayList<Professor>();
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Professor> criteria = cb.createQuery(Professor.class);
+		Root<Professor> professor = criteria.from(Professor.class);
+		criteria.select(professor)
+			.where(cb.equal(professor.get("idade"), idade))
+			.orderBy(cb.asc(professor.get("idade")));
+		resultadoConsultaProfessores.addAll(em.createQuery(criteria).getResultList());					
+		return resultadoConsultaProfessores;
+	}
+	
+	public List<Professor> consultarProfessorPorEmail(String email){		
+		return consultarProfessorPorCampo("email", email);
+	}
+	
+	//formacao
+	public List<Professor> consultarProfessorPorFormacao(String formacao){		
+		return consultarProfessorPorCampo("formacao", formacao);
+	}	
+	//genero
+	public List<Professor> consultarProfessorPorGenero(Genero genero){		
+		ArrayList<Professor> resultadoConsultaProfessores = new ArrayList<Professor>();
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Professor> criteria = cb.createQuery(Professor.class);
+		Root<Professor> professor = criteria.from(Professor.class);
+		criteria.select(professor)
+			.where(cb.equal(professor.get("genero"), genero.name()))
+			.orderBy(cb.asc(professor.get("idade")));
+		resultadoConsultaProfessores.addAll(em.createQuery(criteria).getResultList());					
+		return resultadoConsultaProfessores;
+	}
+	//turmas
+	public List<Turma> listarTurmaMatriculadaDeProfessor(Professor professor){	
+		return (List<Turma>) professor.getTurmasMinistradas();
 	}
 	//Atualizar
-	public Professor atualizar(Professor professor) {
+	public Professor atualizarProfessor(Professor professor) {
 		Professor p = null;
-		if (em.isOpen()) {		
-			p = em.merge(professor);		
-		}		
+		try {
+			em.getTransaction().begin();
+			p = em.merge(professor);
+			 em.getTransaction().commit();
+		} catch (Exception e) {
+			 em.getTransaction().rollback();
+		}finally {
+			pegarProfessoresOrdenadosPorNome();;			
+		}				
 		return p;
 	}
 	//Deletar
-	public ProfessorPercistencia delete(int id) {
-		if (em.isOpen()) {
-			ProfessorPercistencia dao = new ProfessorPercistencia();
-			Professor obj = dao.encontrarPeloId(id);
+	public ProfessorPercistencia deletarProfessorPorId(int id) {
+		try {
+			em.getTransaction().begin();			
+			Professor obj = encontrarPeloId(id);
 			em.remove(em.contains(obj) ? obj : em.merge(obj));
+			 em.getTransaction().commit();
+		} catch (Exception e) {
+			 em.getTransaction().rollback();
+		}finally {
+			pegarProfessoresOrdenadosPorNome();
 		}
 		return this;
 	}
 
-	public List<Turma> listarTurmasDoId(int idProfessor) {
-		Professor professor = encontrarPeloId(idProfessor);
-		return (List<Turma>) professor.getTurmasMinistradas();
-	}
+	
 
 	
 	

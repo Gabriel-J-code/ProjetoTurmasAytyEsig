@@ -49,7 +49,7 @@ public class TurmaServico {
 	//criar
 	public void salvarTurma(Turma turma) throws InvalideFieldException {
 		validarTurma(turma);
-		tp.create(turma);		
+		tp.adicionarNovaTurma(turma);		
 	}
 	
 	public void criarTurma(String disciplina, String horario) throws InvalideFieldException {
@@ -62,16 +62,16 @@ public class TurmaServico {
 		validarTurma(turma);
 		turma.setProfessor(professor);
 		professor.getTurmasMinistradas().add(turma);
-		tp.atualizar(turma);
-		pp.atualizar(professor);				
+		tp.atualizarTurma(turma);
+		pp.atualizarProfessor(professor);				
 	}
 	
 	//cadastrarSala
 	public void cadastrarSala(Turma turma, Sala sala) throws InvalideFieldException {
 		validarTurma(turma);
 		turma.setSala(sala);
-		sp.atualizar(sala);
-		tp.atualizar(turma);				
+		sp.atualizarTurma(sala);
+		tp.atualizarTurma(turma);				
 	}
 	
 	//matricular
@@ -79,8 +79,8 @@ public class TurmaServico {
 			validarTurma(turma);
 			turma.getAlunos().add(aluno);
 			aluno.getTurmasMatriculadas().add(turma);
-			tp.atualizar(turma);
-			ap.atualizar(aluno);
+			tp.atualizarTurma(turma);
+			ap.atualizarAluno(aluno);
 			
 		}	
 	//pegar
@@ -130,7 +130,7 @@ public class TurmaServico {
 	
 	//deletar
 	public void deletarTurma(Turma turma) {
-		ap.delete(turma.getId());
+		ap.deletarAlunoPorId(turma.getId());
 	}
 	
 
