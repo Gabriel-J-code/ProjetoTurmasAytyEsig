@@ -72,8 +72,9 @@ public class TurmaServico {
 		tp.atualizarTurma(turma);				
 	}
 	
-	public void removerSala(Turma turma, Sala sala) {
-		turma.setSala(sala);
+	public void removerSala(Turma turma) {
+		//tp.removerSalaDaTurma(turma);
+		turma.setSala(null);
 		tp.atualizarTurma(turma);
 	}
 	
@@ -114,13 +115,7 @@ public class TurmaServico {
 		return tp.consultarTurmaPorHorario(horario);
 	}
 	
-	
-	//turmas
-	public List<Turma> listarTurmaMatriculadaDeTurma(Turma turma){		
-		List<Turma> resultadoConsultaTurmas = ap.listarTurmasDoId(turma.getId());					
-		return resultadoConsultaTurmas;
-	}	
-	
+		
 	//listar
 	public List<Turma> listarTurmas() {
 		return tp.getTurmas();
@@ -132,7 +127,7 @@ public class TurmaServico {
 	
 	//deletar
 	public void deletarTurma(Turma turma) {
-		ap.deletarAlunoPorId(turma.getId());
+		tp.deletarTurma(turma);
 	}
 	
 

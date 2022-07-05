@@ -69,12 +69,12 @@ public class  AlunoPercistencia {
 	//Criar
 	public AlunoPercistencia adicionarNovoAluno(Aluno aluno) {
 		try {
-			em.getTransaction().begin();
-			em.persist(aluno);			
+			abrir();
+			em.persist(aluno);	
+			fechar();
 		} catch (Exception e) {
 			em.getTransaction().rollback();
-		}finally {
-			em.getTransaction().commit();
+		}finally {			
 			pegarAlunosOrdenadosPorNome();
 		}
 		
@@ -83,13 +83,18 @@ public class  AlunoPercistencia {
 	
 	//LER
 	//todos
-	public List<Aluno> getAlunos() {		
+	public List<Aluno> getAlunos() {	
+		pegarAlunosOrdenadosPorNome();
 		return alunos;
 	}
 	//por id
-	public Aluno encontrarPeloId(int id) {
+	private Aluno encontrarPeloId(int id) {
 		Aluno encotrado = em.find(Aluno.class, id);				
 		return encotrado;
+	}
+	
+	public Aluno pedarDadosAtualizadosDoAluno(Aluno aluno) {
+		return encontrarPeloId(aluno.getId());	
 	}
 	
 	//	
@@ -151,9 +156,26 @@ public class  AlunoPercistencia {
 	}	
 	
 	//turmas
-	public List<Turma> listarTurmasDoId(int idAluno) {		
+	
+	
+	private List<Turma> listarTurmasDoId(int idAluno) {		
 		Aluno aluno = encontrarPeloId(idAluno);		
         return (List<Turma>) aluno.getTurmasMatriculadas();
+        		
+	}
+	
+	public List<Turma> listarTurmasDoAluno(Aluno aluno) {
+		return listarTurmasDoId(aluno.getId());
+	}
+	
+	public List<Turma> listarTurmasDisponiveisParaOAluno(Aluno aluno) {
+				
+		TurmaPercistencia tp = new TurmaPercistencia();
+		List<Turma> turmasDisponiveis = tp.getTurmas();
+		turmasDisponiveis.removeAll(listarTurmasDoAluno(aluno));
+        return turmasDisponiveis;
+        
+		
 		
 	}
 	
@@ -161,31 +183,81 @@ public class  AlunoPercistencia {
 	public Aluno atualizarAluno(Aluno aluno) {
 		Aluno a = null;
 			try {
-				em.getTransaction().begin();
+				abrir();				
 				a = em.merge(aluno);
-				em.flush();
+				fechar();
 			} catch (Exception e) {
 				 em.getTransaction().rollback();
-			}finally {
-				em.getTransaction().commit();
+			}finally {				
 				pegarAlunosOrdenadosPorNome();
 			}				
 		return a;
 			
 	}
 	//Deletar
-	public AlunoPercistencia deletarAlunoPorId(int id) {
+	private AlunoPercistencia deletarAlunoPorId(int id) {
 		try {
-			em.getTransaction().begin();
-			Aluno obj = encontrarPeloId(id);
-			em.remove(em.contains(obj) ? obj : em.merge(obj));
+			abrir();
+			Aluno alunoDB = encontrarPeloId(id);
+			for (Turma turma : alunoDB.getTurmasMatriculadas()) {
+				dematricularAlunoDeTurma(alunoDB, turma);				
+			}
+			em.remove(em.contains(alunoDB) ? alunoDB : em.merge(alunoDB));
+			fechar();
 		}catch (Exception e) {
 			em.getTransaction().rollback();
-		}finally {	
-			em.getTransaction().commit();
+		}finally {				
 			pegarAlunosOrdenadosPorNome();
 		}
 		return this;
+	}
+	
+	public AlunoPercistencia deletarAluno(Aluno aluno) {
+		return deletarAlunoPorId(aluno.getId());
+		
+	}
+	
+	//
+	
+	//Matricular
+	public Aluno matricularAlunoATurma(Aluno aluno, Turma turma) {
+		Aluno alunoDB = encontrarPeloId(aluno.getId());
+		if (alunoDB != null) {
+			TurmaPercistencia  tp = new TurmaPercistencia();
+			Turma turmaDB = tp.encontrarPeloId(turma.getId());
+			if(turmaDB != null) {
+				boolean alunoNaListaDaTurma = turmaDB.getAlunos().contains(alunoDB);		
+				boolean turmaNaListaDoAluno = alunoDB.getTurmasMatriculadas().contains(turmaDB);
+				if (!alunoNaListaDaTurma) {
+						turmaDB.getAlunos().add(alunoDB);
+				}
+				if (!turmaNaListaDoAluno) {
+					alunoDB.getTurmasMatriculadas().add(turmaDB);
+				}				
+				turma = tp.atualizarTurma(turmaDB);
+				tp.getTurmas();
+				alunoDB = atualizarAluno(alunoDB);
+				getAlunos();
+			}
+		}		
+		return alunoDB;	
+	}
+	//Dematricular
+	public Aluno dematricularAlunoDeTurma(Aluno aluno, Turma turma) {
+		
+		try {
+			abrir();
+			em.createNativeQuery(
+					String.format("DELETE FROM tbl_matriculas WHERE id_aluno = %d AND id_turma = %d",
+							aluno.getId(), turma.getId())).executeUpdate();
+			em.flush();			
+			fechar();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		getAlunos();
+		aluno = encontrarPeloId(aluno.getId());
+		return encontrarPeloId(aluno.getId());
 	}
 	
 		

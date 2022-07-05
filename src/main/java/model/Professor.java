@@ -10,16 +10,15 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
@@ -36,25 +35,23 @@ public class Professor implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@NotNull
-	@Size(min = 1, max = 100)
+	@NotBlank(message = "P professor tem que ter um nome")
+	@Size(min = 1, max = 100, message = "O nome do professor tem que entre 1 e 100 caracteres")
 	@Pattern(regexp = "[^0-9]*" , message = "Não pode conter numeros!")
 	private String nome;
 	
-	@Min(value = 0, message = "A idade precisa conter um valor maior que 0!")
+	@Min(value = 0, message = "A idade precisa conter um valor maior que 0.")
 	private int idade;
 	
-	@NotNull(message = "Não pode ser nulo!")
-	@NotEmpty(message = "Não pode esta vazio!")
+	@NotBlank(message = "o email não pode esta em branco")
 	@Column(unique = true)
+	@Max(value = 256, message = "o email tem que ter no maximo 256 caracteres")
 	@Email(message = "Email invalido!")	
 	private String email;
 	
-	@NotNull(message = "Não pode ser nulo!")
-	@NotEmpty(message = "Não pode esta vazio!")
+	@NotBlank(message = "O campo formação não pode está em branco")
 	private String formacao;
 	
-	@NotNull(message = "Não pode ser nulo!")
 	@Enumerated(EnumType.STRING)
 	private Genero genero;
 	
@@ -131,6 +128,13 @@ public class Professor implements Serializable {
 	public void setTurmasMinistradas(Collection<Turma> turmasMatriculadas) {
 		this.turmasMinistradas = turmasMatriculadas;
 		
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		// TODO Auto-generated method stub
+		Professor temp = (Professor) obj;
+		return this.id == temp.getId();
 	}
    
 }

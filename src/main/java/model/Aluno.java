@@ -17,15 +17,12 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
 
 
 @Entity
-@XmlRootElement
 @Table(name = "tbl_aluno")
 public class Aluno implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -34,30 +31,26 @@ public class Aluno implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@NotNull
-	@Size(min = 1, max = 100)
+	@NotBlank(message = "O campo nome não pode estar em branco")
+	@Size(min = 1, max = 100, message = "o nome tem que ter entre 1 e 100 caracteres")
 	@Pattern(regexp = "[^0-9]*" , message = "Não pode conter numeros!")
 	private String nome;
 	
 	@Min(value = 0, message = "A idade precisa conter um valor maior que 0!")
 	private int idade;
 	
-	@NotNull(message = "Não pode ser nulo!")
-	@NotEmpty(message = "Não pode esta vazio!")
+	@NotBlank(message = "O campo email não pode estar em branco")
 	@Column(unique = true)
 	@Email(message = "Email invalido!")	
 	private String email;
 	
-	@NotNull(message = "Não pode ser nulo!")
-	@NotEmpty(message = "Não pode esta vazio!")
+	@NotBlank(message = "O campo curso não pode estar em branco")
 	private String curso;
 	
-	@NotNull(message = "Não pode ser nulo!")
-	@NotEmpty(message = "Não pode esta vazio!")
+	@NotBlank(message = "O campo matricula não pode estar em branco")
 	@Column(unique = true)
 	private String matricula;
 	
-	@NotNull(message = "Não pode ser nulo!")
 	@Enumerated(EnumType.STRING)
 	private Genero genero;
 	
@@ -149,6 +142,13 @@ public class Aluno implements Serializable {
 	public String toString() {
 		
 		return String.format("(%d) nome: %s; idade: %d, genero %s", getId(),getNome(), getIdade(), getGenero().name());
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		// TODO Auto-generated method stub
+		Aluno temp = (Aluno) obj;
+		return this.id == temp.getId();
 	}
    
 }

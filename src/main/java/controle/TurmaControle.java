@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 
 import javax.inject.Named;
@@ -58,11 +57,7 @@ public class TurmaControle implements Serializable {
 		novaTurma();		
 	}
 	
-	@PreDestroy
-	public void exit() {
-		as.exit();
-	}
-	
+		
 	public void sincronizarDados() {
 		turmas = ts.listarTurmas();
 	}
@@ -135,12 +130,7 @@ public class TurmaControle implements Serializable {
 		return Genero.values();
 		
 	}
-	
-	public List<Turma> turmasDoAluno() {
-		return as.listarTurmaMatriculadaDeAluno(alunoFoco);
 		
-	}
-	
 	public void removerAluno() {
 		as.desmatricularTurma(alunoFoco, turmaFoco);
 		sincronizarDados();
@@ -212,6 +202,7 @@ public class TurmaControle implements Serializable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		
+		sincronizarDados();
 	}
 	
 	public void removerProfessor() {
@@ -230,10 +221,12 @@ public class TurmaControle implements Serializable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		sincronizarDados();
 	}
 	
 	public void removerSala() {
-		ts.removerSala(turmaFoco, turmaFoco.getSala());
+		ts.removerSala(turmaFoco);
+		sincronizarDados();
 	}
 	
 	

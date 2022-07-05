@@ -6,15 +6,12 @@ import model.Aluno;
 import model.Genero;
 import model.Turma;
 import percistencia.AlunoPercistencia;
-import percistencia.TurmaPercistencia;
 
 public class AlunoServico {
 	private AlunoPercistencia ap;
-	private TurmaPercistencia tp;
 		
 	public AlunoServico() {
 		ap = new AlunoPercistencia();
-		tp = new TurmaPercistencia();
 	}
 	
 	public void exit() {
@@ -22,7 +19,7 @@ public class AlunoServico {
 	}
 	
 	//validar
-	private void validarAluno(Aluno aluno) throws InvalideFieldException {
+	/*private void validarAluno(Aluno aluno) throws InvalideFieldException {
 		
 		if(aluno.getNome()==null ||aluno.getNome()=="") {
 			throw new InvalideFieldException("Alunos com nome em branco; ");
@@ -42,52 +39,33 @@ public class AlunoServico {
 		if(aluno.getMatricula()==null ||aluno.getMatricula()=="") {
 			throw new InvalideFieldException("Alunos com matricula em branco; ");
 		}				
-	}
+	}*/
 	
 	//matricular
-	public void matricularTurma(Aluno aluno,Turma turma) throws InvalideFieldException {
-		validarAluno(aluno);
-		aluno.getTurmasMatriculadas().add(turma);
-		turma.getAlunos().add(aluno);
-		ap.atualizarAluno(aluno);
-		tp.atualizarTurma(turma);
+	public void matricularTurma(Aluno aluno,Turma turma){
+		ap.matricularAlunoATurma(aluno, turma);
 	}	
 	
 	//desmatricular aluno
 	public void desmatricularTurma(Aluno aluno,Turma turma){		
-		aluno.getTurmasMatriculadas().remove(turma);
-		turma.getAlunos().remove(aluno);		
-		tp.atualizarTurma(turma);
-		ap.atualizarAluno(aluno);
+		ap.dematricularAlunoDeTurma(aluno, turma);
 	}
 			
 	//atualizar
 	public Aluno atualizarAluno(Aluno aluno) {
-		try {
-			validarAluno(aluno);
-			ap.atualizarAluno(aluno);
-			return aluno;
-		} catch (InvalideFieldException e) {
-			Aluno novo = ap.encontrarPeloId(aluno.getId());
-			return novo;
-		}		
+		return ap.atualizarAluno(aluno);		
 	}
 	
-	public void salvarNovoAluno(String nome, int idade, String email, String curso, String matricula, Genero genero) throws InvalideFieldException {
+	public void salvarNovoAluno(String nome, int idade, String email, String curso, String matricula, Genero genero){
 		Aluno aluno = new Aluno(nome, idade, email, curso, matricula, genero);
 		salvarNovoAluno(aluno);		
 	}
 	
-	public void salvarNovoAluno(Aluno aluno) throws InvalideFieldException {
-		validarAluno(aluno);		
+	public void salvarNovoAluno(Aluno aluno){			
 		ap.adicionarNovoAluno(aluno);
 	}
 	//pegar
-	
-	//id
-	public Aluno procurarAlunoPorId(Integer id) {
-		return ap.encontrarPeloId(id);		
-	}
+		
 		
 	//nome
 	public List<Aluno> procurarAlunoPorNome(String nome){		
@@ -117,10 +95,10 @@ public class AlunoServico {
 		return ap.consultarAlunoPorGenero(genero);
 	}
 	//turmas
-	public List<Turma> listarTurmaMatriculadaDeAluno(Aluno aluno){		
+	/*public List<Turma> listarTurmaMatriculadaDeAluno(Aluno aluno){		
 		List<Turma> resultadoConsultaTurmas = ap.listarTurmasDoId(aluno.getId());					
 		return resultadoConsultaTurmas;
-	}	
+	}	*/
 	
 	//listar
 	public List<Aluno> listarAlunos() {
@@ -129,7 +107,7 @@ public class AlunoServico {
 	
 	//deletar
 	public void deletarAluno(Aluno aluno) {
-		ap.deletarAlunoPorId(aluno.getId());
+		ap.deletarAluno(aluno);
 	}
 	
 

@@ -12,9 +12,9 @@ import javax.inject.Named;
 import model.Aluno;
 import model.Genero;
 import model.Turma;
-import servico.AlunoServico;
-import servico.InvalideFieldException;
-import servico.TurmaServico;
+import percistencia.AlunoPercistencia;
+import percistencia.TurmaPercistencia;
+
 
 @Named("alunoCon")
 @ApplicationScoped
@@ -26,9 +26,8 @@ public class AlunoControle implements Serializable {
 	private boolean mostrarTurmasDisponiveis = false;
 	private Collection<Aluno> alunos;
 	private Turma turmaFoco;
-	
-	private AlunoServico as;
-	private TurmaServico ts;
+		
+	private AlunoPercistencia ap;
 	
 
 	public AlunoControle() {
@@ -36,20 +35,21 @@ public class AlunoControle implements Serializable {
 	}	
 	
 	@PostConstruct
-	public void init() {
-		as = new AlunoServico();
-		ts = new TurmaServico();
-		alunos = as.listarAlunos();
+	public void init() {	
+		
+		
+		ap = new AlunoPercistencia();
+		sincronizarDados();
 		novoAluno();		
 	}
 	
 	@PreDestroy
 	public void exit() {
-		as.exit();
+	ap.fechar();
 	}
 	
 	public void sincronizarDados() {
-		alunos = as.listarAlunos();
+		alunos = ap.getAlunos();
 	}
 	//metodos
 	public void novoAluno() {
@@ -58,20 +58,15 @@ public class AlunoControle implements Serializable {
 		sincronizarDados();
 		
 	}
-	public void salvarNovoAluno(){
-		try {
-			as.salvarNovoAluno(alunoFoco);
-		} catch (InvalideFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
+	public void salvarNovoAluno(){		
+		ap.adicionarNovoAluno(alunoFoco);	
 		novoAluno();
 		
 	}
 	
 	public void excluirAluno() {
 		if(alunos.contains(alunoFoco)) {
-			as.deletarAluno(alunoFoco);
+			ap.deletarAluno(alunoFoco);
 			sincronizarDados();
 		}
 		novoAluno();
@@ -82,14 +77,29 @@ public class AlunoControle implements Serializable {
 		
 	}
 	
-	public List<Turma> turmasDoAluno() {
-		return as.listarTurmaMatriculadaDeAluno(alunoFoco);
+	public List<Turma> turmasDoAluno() {		
+		return (List<Turma>) alunoFoco.getTurmasMatriculadas();
 		
 	}
 	
 	public void removerTurma() {
-		as.desmatricularTurma(alunoFoco, turmaFoco);
+		ap.dematricularAlunoDeTurma(alunoFoco, turmaFoco);
 		sincronizarDados();
+		alunoFoco = ap.pedarDadosAtualizadosDoAluno(alunoFoco);
+	}
+	
+	public void matricularAlunoATurma() {
+		ap.matricularAlunoATurma(alunoFoco, turmaFoco);
+		sincronizarDados();
+		alunoFoco = ap.pedarDadosAtualizadosDoAluno(alunoFoco);
+	}
+	
+	public List<Turma> turmasDisponiveis() {
+		TurmaPercistencia tp = new TurmaPercistencia();
+		List<Turma> turmasDisponiveis =  tp.getTurmas();	
+		turmasDisponiveis.removeAll(alunoFoco.getTurmasMatriculadas());
+		return turmasDisponiveis;
+		
 	}
 	
 	//GETs e SETs
@@ -101,6 +111,7 @@ public class AlunoControle implements Serializable {
 	public void setAlunoFoco(Aluno alunoFoco) {
 		this.alunoFoco = alunoFoco;
 		existente = true;
+		mostrarTurmasDisponiveis = false;
 	}
 
 	public Collection<Aluno> getAlunos() {
@@ -139,19 +150,7 @@ public class AlunoControle implements Serializable {
 		
 	}
 	
-	public List<Turma> turmasDisponiveis() {
-		return ts.listarTurmas();
-		
-	}
 	
-	public void matricularAlunoATurma() {
-		try {
-			as.matricularTurma(alunoFoco, turmaFoco);
-		} catch (InvalideFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
-	}
 	
 	
 	

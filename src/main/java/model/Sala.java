@@ -3,8 +3,7 @@ package model;
 import java.io.Serializable;
 import java.lang.String;
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 /**
@@ -21,18 +20,15 @@ public class Sala implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@NotNull
-	@NotEmpty
+	@NotBlank(message = "O campo numero não pode esta em branco.")
 	@Size(min = 1, max = 10)
 	private String numero;
 	
-	@NotNull
-	@NotEmpty
+	@NotBlank(message = "O campo predio não pode esta em branco.")
 	@Size(min = 1, max = 50)
 	private String predio;
 	
-	@NotNull
-	@NotEmpty
+	@NotBlank(message = "O campo campus não pode esta em branco.")
 	@Size(min = 1, max = 50)
 	private String campus;
 
@@ -86,4 +82,11 @@ public class Sala implements Serializable {
 			// TODO Auto-generated method stub
 			return String.format("Sala %s, predio: %s, campus: %s.", numero, predio, campus);
 		}
+	
+	@Override
+	public boolean equals(Object obj) {
+		// TODO Auto-generated method stub
+		Sala temp = (Sala) obj;
+		return this.id == temp.getId();
+	}
 }

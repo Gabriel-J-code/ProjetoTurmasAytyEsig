@@ -4,13 +4,11 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 
 import model.Sala;
-import servico.SalaServico;
-import servico.InvalideFieldException;
+import percistencia.SalaPercistencia;
 
 @Named("salaCon")
 @ApplicationScoped
@@ -20,7 +18,8 @@ public class SalaControle implements Serializable {
 	private Sala salaFoco;
 	private Collection<Sala> salas;
 	
-	private SalaServico ss;
+	
+	private SalaPercistencia sp;
 	
 
 	public SalaControle() {
@@ -29,18 +28,14 @@ public class SalaControle implements Serializable {
 	
 	@PostConstruct
 	public void init() {
-		ss = new SalaServico();		
+		sp = new SalaPercistencia();
 		sincronizarDados();
 		novaSala();		
 	}
 	
-	@PreDestroy
-	public void exit() {
-		ss.exit();
-	}
-	
+		
 	public void sincronizarDados() {
-		salas = ss.listarSalas();
+		salas = sp.getSalas();
 	}
 	//metodos
 	public void novaSala() {
@@ -49,19 +44,14 @@ public class SalaControle implements Serializable {
 		
 	}
 	public void salvarNovaSala(){
-		try {
-			ss.salvarNovaSala(salaFoco);
-		} catch (InvalideFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
+		sp.adicionarNovaSala(salaFoco);			
 		novaSala();
 		
 	}
 	
 	public void excluirSala() {
 		if(salas.contains(salaFoco)) {
-			ss.deletarSala(salaFoco);
+			sp.deleteSala(salaFoco);			
 			sincronizarDados();
 		}
 
@@ -80,6 +70,7 @@ public class SalaControle implements Serializable {
 	}
 
 	public Collection<Sala> getSalas() {
+		sincronizarDados();
 		return salas;
 	}
 

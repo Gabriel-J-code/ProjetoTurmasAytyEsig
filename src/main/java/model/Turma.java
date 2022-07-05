@@ -6,8 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 /**
@@ -23,23 +22,23 @@ public class Turma implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@NotNull
-	@NotEmpty
-	@Size(min = 1, max = 100)
-	private String disciplina;
+	@NotBlank(message = "O campo diciplina não pode estar em branco.")
+	@Size(min = 1, max = 100, message = "O nome da diciplina tem que ter entre 1 e 100 cacteres.")
+	private String disciplina; // futuramente tranformar em obj 
 	
+	@NotBlank(message = "O campo horario não pode esta em branco")
+	@Size(min = 3, message = "O horario tem que ter no minimo 3 caracteres.")	
+	private String horario; //futuramente Tranformar em obj
 	
-	private String horario;
-	
-	@ManyToOne(targetEntity=Professor.class, fetch=FetchType.EAGER)
+	@ManyToOne(targetEntity=Professor.class)
 	@JoinColumn(name = "id_professor")
 	private Professor professor;
 	
-	@ManyToOne(targetEntity=Sala.class, fetch=FetchType.EAGER)
+	@ManyToOne(targetEntity=Sala.class)
 	@JoinColumn(name = "id_sala")
 	private Sala sala;
 	
-	@ManyToMany(cascade = CascadeType.REFRESH, fetch=FetchType.EAGER)
+	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name="tbl_matriculas", joinColumns= {@JoinColumn(name="id_turma")}, inverseJoinColumns={@JoinColumn(name="id_aluno")})
 	private Collection<Aluno> alunos;
 
@@ -116,4 +115,10 @@ public class Turma implements Serializable {
 			return String.format("(%d) %s, horario: %s, professor: %s, sala: %s.", this.id, this.disciplina, this.horario, this.professor, this.sala);
 		}
    
+	@Override
+	public boolean equals(Object obj) {
+		// TODO Auto-generated method stub
+		Turma temp = (Turma) obj;
+		return this.id == temp.getId();
+	}
 }

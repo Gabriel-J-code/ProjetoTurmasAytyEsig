@@ -78,7 +78,7 @@ public class SalaServico {
 	
 	//deletar
 	public void deletarSala(Sala sala) {
-		sp.deleteSalaProId(sala.getId());
+		sp.deleteSalaPorId(sala.getId());
 	}
 	
 

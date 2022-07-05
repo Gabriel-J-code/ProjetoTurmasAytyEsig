@@ -20,6 +20,7 @@ import javax.persistence.criteria.Root;
 
 import model.Aluno;
 import model.Professor;
+import model.Sala;
 import model.Turma;
 
 @RequestScoped
@@ -63,8 +64,7 @@ public class  TurmaPercistencia {
 		return this;
 	}
 	
-	private TurmaPercistencia fechar() {
-		em.flush();
+	private TurmaPercistencia fechar() {		
 		em.getTransaction().commit();
 		return this;
 	}
@@ -86,7 +86,8 @@ public class  TurmaPercistencia {
 	
 	//LER
 	//todos
-	public List<Turma> getTurmas() {		
+	public List<Turma> getTurmas() {
+		pegarTurmasOrdenadasPorDiciplina();
 		return turmas;
 	}
 	//por id
@@ -130,11 +131,26 @@ public class  TurmaPercistencia {
 	public List<Turma> consultarTurmaPorHorario(String horario) {
 		return consultarTurmaPorCampo("horario", horario);	
 	}
+	
+	//sala
+	public List<Turma> consultarTurmaPorSala(Sala sala) {
+		List<Turma> resultadoConsultaTurmas = new ArrayList<Turma>();
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Turma> criteria = cb.createQuery(Turma.class);
+		Root<Turma> turma = criteria.from(Turma.class);
+		criteria.select(turma)
+			.where(cb.equal(turma.get("sala"), sala))
+			.orderBy(cb.asc(turma.get("disciplina")));
+		resultadoConsultaTurmas.addAll(em.createQuery(criteria).getResultList());
+		return null;
+		
+	}
 		
 	//aluno
 	public List<Aluno> consultarAlunosMatriculadosNaTurma(Turma turma) {
 		return (List<Aluno>) turma.getAlunos();		
 	}
+	
 	
 	//Atualizar
 	public Turma atualizarTurma(Turma turma) {
@@ -166,6 +182,10 @@ public class  TurmaPercistencia {
 		}		
 		return this;
 	}
+	
+	public TurmaPercistencia deletarTurma(Turma turma) {
+		return deletarTurmaPorId(turma.getId());
+	}
 
 	public List<Turma> getTurmasSemProfessor() {
 		List<Turma> resultadoConsultaTurmas = new ArrayList<Turma>();
@@ -180,18 +200,40 @@ public class  TurmaPercistencia {
 	}
 	
 	public void removerProfessorDeTurma(Turma turma) {
-		Professor antigo = turma.getProfessor();
-		System.out.println();
+		if(turma.getProfessor() != null) {			
+			ProfessorPercistencia pp = new ProfessorPercistencia();
+			Professor profAntigo = pp.encontrarPeloId(turma.getProfessor().getId());
+			profAntigo.getTurmasMinistradas().remove(turma);
+			Turma turmaDB = encontrarPeloId(turma.getId());
+			turmaDB.setProfessor(null);			
+			pp.atualizarProfessor(profAntigo);
+			pp.getProfessores();
+			atualizarTurma(turmaDB);
+			
+			/* 	
+			abrir();
+			CriteriaBuilder cb = em.getCriteriaBuilder();
+			CriteriaUpdate<Turma> update = cb.createCriteriaUpdate(Turma.class);
+			Root<Turma> t = update.from(Turma.class);
+			update.set("professor", null).where(cb.equal(t.get("id"), turma.getId()));
+			int result = em.createQuery(update).executeUpdate();
+			if (result == 1 && antigo!=null) {
+				antigo.getTurmasMinistradas().remove(turma);			
+			}*/
+			
+		}
+			
+	}
+
+	public void removerSalaDaTurma(Turma turma) {
 		abrir();
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaUpdate<Turma> update = cb.createCriteriaUpdate(Turma.class);
 		Root<Turma> t = update.from(Turma.class);
-		update.set("professor", null).where(cb.equal(t.get("id"), turma.getId()));
-		int result = em.createQuery(update).executeUpdate();
-		if (result == 1 && antigo!=null) {
-			antigo.getTurmasMinistradas().remove(turma);			
-		}
-			
+		update.set("sala", null).where(cb.equal(t.get("id"), turma.getId()));
+		em.createQuery(update).executeUpdate();
+		
+		
 	}
 	
 		
