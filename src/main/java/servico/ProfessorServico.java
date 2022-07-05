@@ -14,6 +14,7 @@ public class ProfessorServico {
 		
 	public ProfessorServico() {
 		pp = new ProfessorPercistencia();
+		tp = new TurmaPercistencia();
 	}
 	
 	public void exit() {
@@ -110,7 +111,7 @@ public class ProfessorServico {
 	//listar
 	public List<Professor> listarProfessors() {
 		return pp.getProfessores();
-	}
+	}	
 	
 	//deletar
 	public void deletarProfessor(Professor professor) {

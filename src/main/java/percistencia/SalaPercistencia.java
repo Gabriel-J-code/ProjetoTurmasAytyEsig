@@ -13,7 +13,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import model.Professor;
 import model.Sala;
 
 public class  SalaPercistencia {
@@ -25,15 +24,15 @@ public class  SalaPercistencia {
 	
 	static {
 		try {
-			emf = Persistence.createEntityManagerFactory("turmasAyty");
+			emf = Persistence.createEntityManagerFactory("TurmasAytyEsig");
 			em = emf.createEntityManager();
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
 	}
 	
-	public SalaPercistencia() {		
-		abrir();
+	public SalaPercistencia() {			
+		pegarSalasOrdenadosPorNumero();
 	}
 	
 	public void onListaSalasChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Sala sala) {
@@ -66,10 +65,10 @@ public class  SalaPercistencia {
 		try {
 		abrir();
 		em.persist(sala);
-		fechar();
 		}catch (Exception e) {
 			em.getTransaction().rollback();
 		}finally {
+			fechar();
 			pegarSalasOrdenadosPorNumero();
 		}
 		return this;
@@ -136,12 +135,13 @@ public class  SalaPercistencia {
 	public Sala atualizarSala(Sala Sala) {
 		Sala s = null;
 		try {
-			em.getTransaction().begin();		
-		Sala p = em.merge(Sala);
-		 em.getTransaction().commit();
+			em.getTransaction().begin();			
+			s = em.merge(Sala);
+			em.flush();
 		} catch (Exception e) {
 			 em.getTransaction().rollback();
 		}finally {
+			fechar();
 			pegarSalasOrdenadosPorNumero();
 		}
 		return s;
@@ -152,10 +152,10 @@ public class  SalaPercistencia {
 			em.getTransaction().begin();		
 			Sala s = encontrarSalaPeloId(id);
 			em.remove(s);
-		 em.getTransaction().commit();
 		} catch (Exception e) {
 			 em.getTransaction().rollback();
 		}finally {
+			 fechar();
 			pegarSalasOrdenadosPorNumero();
 		}
 		return this;

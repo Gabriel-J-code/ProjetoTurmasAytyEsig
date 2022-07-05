@@ -35,7 +35,6 @@ public class  ProfessorPercistencia {
 	}
 	
 	public ProfessorPercistencia() {			
-		abrir();
 		pegarProfessoresOrdenadosPorNome();
 	}
 	
@@ -68,11 +67,11 @@ public class  ProfessorPercistencia {
 	public ProfessorPercistencia adicionarNovoProfessor(Professor professor) {
 		try {
 			abrir();
-			em.persist(professor);
-			fechar();
+			em.persist(professor);			
 		} catch (Exception e) {
 			em.getTransaction().rollback();
 		}finally {
+			 em.getTransaction().commit();
 			pegarProfessoresOrdenadosPorNome();;
 		}
 		return this;
@@ -154,7 +153,7 @@ public class  ProfessorPercistencia {
 	}
 	//turmas
 	public List<Turma> listarTurmaMatriculadaDeProfessor(Professor professor){	
-		return (List<Turma>) professor.getTurmasMinistradas();
+		return (List<Turma>) encontrarPeloId(professor.getId()).getTurmasMinistradas();
 	}
 	//Atualizar
 	public Professor atualizarProfessor(Professor professor) {
@@ -162,10 +161,11 @@ public class  ProfessorPercistencia {
 		try {
 			em.getTransaction().begin();
 			p = em.merge(professor);
-			 em.getTransaction().commit();
+			em.flush();
 		} catch (Exception e) {
 			 em.getTransaction().rollback();
 		}finally {
+			 em.getTransaction().commit();
 			pegarProfessoresOrdenadosPorNome();;			
 		}				
 		return p;
@@ -176,10 +176,11 @@ public class  ProfessorPercistencia {
 			em.getTransaction().begin();			
 			Professor obj = encontrarPeloId(id);
 			em.remove(em.contains(obj) ? obj : em.merge(obj));
-			 em.getTransaction().commit();
+			 
 		} catch (Exception e) {
 			 em.getTransaction().rollback();
 		}finally {
+			 em.getTransaction().commit();
 			pegarProfessoresOrdenadosPorNome();
 		}
 		return this;

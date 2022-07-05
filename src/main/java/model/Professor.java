@@ -5,6 +5,7 @@ import java.lang.String;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -54,16 +55,15 @@ public class Professor implements Serializable {
 	private String formacao;
 	
 	@NotNull(message = "Não pode ser nulo!")
-	@NotEmpty(message = "Não pode esta vazio!")
 	@Enumerated(EnumType.STRING)
 	private Genero genero;
 	
-	@OneToMany(mappedBy = "professor", fetch=FetchType.EAGER)
+	@OneToMany(mappedBy = "professor",cascade = CascadeType.ALL)
 	private Collection<Turma> turmasMinistradas;
 
 
 	public Professor() {
-		super();
+		this.turmasMinistradas = new ArrayList<Turma>();
 	}   
 	
 	public Professor(String nome, int idade, String email, String formacao, Genero genero) {

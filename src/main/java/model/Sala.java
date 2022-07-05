@@ -81,4 +81,9 @@ public class Sala implements Serializable {
 		this.campus = campus;
 	}
    
+	@Override
+		public String toString() {
+			// TODO Auto-generated method stub
+			return String.format("Sala %s, predio: %s, campus: %s.", numero, predio, campus);
+		}
 }

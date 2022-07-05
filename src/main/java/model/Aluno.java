@@ -57,7 +57,7 @@ public class Aluno implements Serializable {
 	@Column(unique = true)
 	private String matricula;
 	
-	@NotNull
+	@NotNull(message = "Não pode ser nulo!")
 	@Enumerated(EnumType.STRING)
 	private Genero genero;
 	
@@ -66,7 +66,7 @@ public class Aluno implements Serializable {
 
 
 	public Aluno() {
-		super();
+		turmasMatriculadas = new ArrayList<Turma>();
 	}  
 	
 	public Aluno(String nome, int idade, String email, String curso, String matricula, Genero genero) {

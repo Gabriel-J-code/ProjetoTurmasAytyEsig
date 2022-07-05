@@ -4,29 +4,37 @@ package percistencia;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.event.Reception;
+import javax.enterprise.inject.Produces;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 
 import model.Aluno;
 import model.Professor;
 import model.Turma;
 
+@RequestScoped
 public class  TurmaPercistencia {
-	
-	private static List<Turma> turmas = new ArrayList<Turma>();
+	@Produces
+    @Named
+	private static List<Turma> turmas;
 	
 	private static EntityManagerFactory emf;
+	
 	private static EntityManager em;
 	
 	static {
 		try {
-			emf = Persistence.createEntityManagerFactory("turmasAyty");
+			emf = Persistence.createEntityManagerFactory("TurmasAytyEsig");
 			em = emf.createEntityManager();
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
@@ -34,7 +42,6 @@ public class  TurmaPercistencia {
 	}
 	
 	public TurmaPercistencia() {
-		abrir();
 		pegarTurmasOrdenadasPorDiciplina();
 		
 	}
@@ -42,7 +49,7 @@ public class  TurmaPercistencia {
 	public void onListaTurmasChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Turma turma) {
 		pegarTurmasOrdenadasPorDiciplina();
     }
-	
+	@PostConstruct
 	private void pegarTurmasOrdenadasPorDiciplina() {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Turma> criteria = cb.createQuery(Turma.class);
@@ -57,6 +64,7 @@ public class  TurmaPercistencia {
 	}
 	
 	private TurmaPercistencia fechar() {
+		em.flush();
 		em.getTransaction().commit();
 		return this;
 	}
@@ -65,11 +73,12 @@ public class  TurmaPercistencia {
 	public TurmaPercistencia adicionarNovaTurma(Turma entidade) {
 		try {
 			abrir();
-			em.persist(entidade);
+			em.persist(entidade);			
 			fechar();
 		}catch (Exception e) {
 			em.getTransaction().rollback();
 		}finally {
+			
 			pegarTurmasOrdenadasPorDiciplina();
 		}
 		return this;
@@ -128,20 +137,61 @@ public class  TurmaPercistencia {
 	}
 	
 	//Atualizar
-	public Turma atualizarTurma(Turma Turma) {
-		abrir();		
-		Turma p = em.merge(Turma);		
-		fechar();		
-		return p;
+	public Turma atualizarTurma(Turma turma) {
+		
+		try {
+			abrir();
+			turma = em.merge(turma);	
+			em.flush();
+			fechar();	
+		} catch (Exception e) {
+			em.getTransaction().rollback();
+		}finally {	
+			pegarTurmasOrdenadasPorDiciplina();
+		}		
+		return turma;
 	}
+	
+	
 	//Deletar
 	public TurmaPercistencia deletarTurmaPorId(int id) {
-		abrir();
-		TurmaPercistencia dao = new TurmaPercistencia();
-		Turma obj = dao.encontrarPeloId(id);
-		em.remove(em.contains(obj) ? obj : em.merge(obj));
-		fechar();
+		try {
+			abrir();
+			TurmaPercistencia dao = new TurmaPercistencia();
+			Turma obj = dao.encontrarPeloId(id);
+			em.remove(em.contains(obj) ? obj : em.merge(obj));
+			fechar();
+		} catch (Exception e) {
+			em.getTransaction().rollback();
+		}		
 		return this;
+	}
+
+	public List<Turma> getTurmasSemProfessor() {
+		List<Turma> resultadoConsultaTurmas = new ArrayList<Turma>();
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Turma> criteria = cb.createQuery(Turma.class);
+		Root<Turma> turma = criteria.from(Turma.class);
+		criteria.select(turma)
+			.where(cb.isNull(turma.get("professor")))
+			.orderBy(cb.asc(turma.get("disciplina")));
+		resultadoConsultaTurmas.addAll(em.createQuery(criteria).getResultList());
+		return null;
+	}
+	
+	public void removerProfessorDeTurma(Turma turma) {
+		Professor antigo = turma.getProfessor();
+		System.out.println();
+		abrir();
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaUpdate<Turma> update = cb.createCriteriaUpdate(Turma.class);
+		Root<Turma> t = update.from(Turma.class);
+		update.set("professor", null).where(cb.equal(t.get("id"), turma.getId()));
+		int result = em.createQuery(update).executeUpdate();
+		if (result == 1 && antigo!=null) {
+			antigo.getTurmasMinistradas().remove(turma);			
+		}
+			
 	}
 	
 		

@@ -2,14 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:h="http://java.sun.com/jsf/html"> <h:head>
-	<title>Cadastro Aluno </title>
-	<style>
-		@IMPORT url(estilo.css);
-		</style>
-</h:head> <h:body>
-	<h:head></h:head> 
-<body> 
+	xmlns:h="http://java.sun.com/jsf/html"> 
+	<ui:composition template="/estrutura.xhtml">
+	<ui:param name="titulo" value="Cadastro de Aluno" />
+	<ui:define name="direita">
+		<h:messages infoClass="info" errorClass="erro" warnClass="warn" fatalClass="fatal" />
+	</ui:define>
+	
 <h1>Cadastro de Aluno</h1>
 	<h:form>
 		<h:messages />
@@ -24,7 +23,7 @@
 			<h:inputText id="idade"
 				value="#{alunoCon.alunoFoco.idade}"> 
 				<f:convertNumber integerOnly="true" minIntegerDigits="0"/></h:inputText>
-			<h:message for="name"/>
+			<h:message for="idade"/>
 		
 			<h:outputLabel for="email" value="Email: " /> 
 			<h:inputText id="email"
@@ -51,8 +50,72 @@
 				value="#{alunoCon.alunoFoco.genero}" >
 				<f:selectItems value="#{alunoCon.generos()}"
 				 var="g" itemLabel="#{g.descricao}"/></h:selectOneRadio>
-			<h:message for="genero"/>		
+			<h:message for="genero"/>	
+			
+			<h:outputLabel for="turmas" value="Turmas matriculadas: " />
+				<h:panelGrid columns="1" rendered="#{alunoCon.existente}">
+				<h:dataTable value="#{alunoCon.turmasDoAluno()}" var="t">
+				
+					<h:column>
+						<f:facet name="header">Diciplina</f:facet>
+						#{t.disciplina}
+					</h:column>
+			
+					<h:column>
+						<f:facet name="header">Horario</f:facet>
+						#{t.horario}
+					</h:column>				
+					
+					<h:column>
+						<f:facet name="header">Professor</f:facet>
+						#{t.professor.nome}
+					</h:column>	
+					
+					<h:column>
+				<f:facet name="header">Ações</f:facet>
+				<h:commandLink value="Remover" action="#{alunoCon.removerTurma()}">
+					<f:setPropertyActionListener value="#{t}"
+						target="#{alunoCon.turmaFoco}">
+					</f:setPropertyActionListener>					
+				</h:commandLink>				
+			</h:column>				
+				</h:dataTable>
+				
+				<h:commandButton action="#{alunoCon.mudarMostrarTurmasSisponiveis()}" value="Add..." />
+				
+				<h:dataTable value="#{alunoCon.turmasDisponiveis()}" var="td" rendered="#{alunoCon.mostrarTurmasDisponiveis}">
+				
+					<h:column>
+						<f:facet name="header">Diciplina</f:facet>
+						#{td.disciplina}
+					</h:column>
+			
+					<h:column>
+						<f:facet name="header">Horario</f:facet>
+						#{td.horario}
+					</h:column>			
+					
+					<h:column>
+						<f:facet name="header">Professor</f:facet>
+						#{td.professor.nome}
+					</h:column>		
+					
+					<h:column>
+				<f:facet name="header">Ações</f:facet>
+				<h:commandLink value="Cadastrar" action="#{alunoCon.matricularAlunoATurma()}">
+					<f:setPropertyActionListener value="#{td}"
+						target="#{alunoCon.turmaFoco}">
+					</f:setPropertyActionListener>					
+				</h:commandLink>				
+			</h:column>				
+				</h:dataTable>
+				
+				</h:panelGrid>
+				<h:outputText rendered="#{!alunoCon.existente}" value="#{alunoCon.MensagemCampoTurmas()}" />
+			
+				
 		</h:panelGrid>
+		
 
 		<h:commandButton value="Salvar"
 			action="#{alunoCon.salvarNovoAluno()}" />
@@ -99,5 +162,5 @@
 			</h:column>
 		</h:dataTable>
 	</h:form>
-	</body>
-</h:body> </html>
+	</ui:composition>
+</html>

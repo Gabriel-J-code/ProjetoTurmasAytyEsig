@@ -14,6 +14,7 @@ public class AlunoServico {
 		
 	public AlunoServico() {
 		ap = new AlunoPercistencia();
+		tp = new TurmaPercistencia();
 	}
 	
 	public void exit() {

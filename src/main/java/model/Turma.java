@@ -45,7 +45,7 @@ public class Turma implements Serializable {
 
 
 	public Turma() {
-		super();
+		alunos = new ArrayList<Aluno>();
 	}   
 	
 	public Turma(String disciplina, String horario) {

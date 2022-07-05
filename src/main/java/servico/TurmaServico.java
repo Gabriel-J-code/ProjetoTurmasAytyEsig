@@ -1,6 +1,5 @@
 package servico;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import model.Turma;
@@ -63,11 +62,8 @@ public class TurmaServico {
 		pp.atualizarProfessor(professor);				
 	}
 	
-	public void descastrarProfessor(Turma turma, Professor professor) {
-		turma.setProfessor(new Professor());
-		professor.getTurmasMinistradas().remove(turma);		
-		tp.atualizarTurma(turma);
-		pp.atualizarProfessor(professor);
+	public void descastrarProfessor(Turma turma) {
+		tp.removerProfessorDeTurma(turma);
 	}
 	
 	//cadastrarSala
@@ -128,6 +124,10 @@ public class TurmaServico {
 	//listar
 	public List<Turma> listarTurmas() {
 		return tp.getTurmas();
+	}
+	
+	public List<Turma> listarTurmasSemProfessor(){
+		return tp.getTurmasSemProfessor();
 	}
 	
 	//deletar

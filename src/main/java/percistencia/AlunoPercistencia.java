@@ -35,8 +35,7 @@ public class  AlunoPercistencia {
 		}
 	}
 		
-	public AlunoPercistencia() {	
-		abrir();
+	public AlunoPercistencia() {			
 		pegarAlunosOrdenadosPorNome();
 	}
 	
@@ -71,11 +70,11 @@ public class  AlunoPercistencia {
 	public AlunoPercistencia adicionarNovoAluno(Aluno aluno) {
 		try {
 			em.getTransaction().begin();
-			em.persist(aluno);
-			em.getTransaction().commit();
+			em.persist(aluno);			
 		} catch (Exception e) {
 			em.getTransaction().rollback();
 		}finally {
+			em.getTransaction().commit();
 			pegarAlunosOrdenadosPorNome();
 		}
 		
@@ -164,10 +163,11 @@ public class  AlunoPercistencia {
 			try {
 				em.getTransaction().begin();
 				a = em.merge(aluno);
-				 em.getTransaction().commit();
+				em.flush();
 			} catch (Exception e) {
 				 em.getTransaction().rollback();
 			}finally {
+				em.getTransaction().commit();
 				pegarAlunosOrdenadosPorNome();
 			}				
 		return a;
@@ -179,10 +179,10 @@ public class  AlunoPercistencia {
 			em.getTransaction().begin();
 			Aluno obj = encontrarPeloId(id);
 			em.remove(em.contains(obj) ? obj : em.merge(obj));
-			em.getTransaction().commit();
 		}catch (Exception e) {
 			em.getTransaction().rollback();
-		}finally {			
+		}finally {	
+			em.getTransaction().commit();
 			pegarAlunosOrdenadosPorNome();
 		}
 		return this;

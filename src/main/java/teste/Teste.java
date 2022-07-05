@@ -3,10 +3,8 @@ package teste;
 import java.util.List;
 
 import model.Aluno;
-import model.Genero;
 import model.Turma;
 import servico.AlunoServico;
-import servico.InvalideFieldException;
 
 public class Teste {
 

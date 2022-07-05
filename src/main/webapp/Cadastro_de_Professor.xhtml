@@ -1,7 +1,148 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <title></title>
-    </head>
-    <body></body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"> 
+	<ui:composition template="/estrutura.xhtml">
+	<ui:param name="titulo" value="Cadastro de Professor" />
+	<ui:define name="direita">
+		<h:messages infoClass="info" errorClass="erro" warnClass="warn" fatalClass="fatal" />
+	</ui:define>
+	
+	<h1>Cadastro de Professor</h1>
+    <h:form>
+		<h:panelGrid columnClasses="titleCamp, inputCamp, messageCamp"  columns="3">
+		
+			<h:outputLabel for="nome" value="Nome: " />
+			<h:inputText id="nome"
+				value="#{professorCon.professorFoco.nome}" />
+			<h:message for="name"/>
+		
+			<h:outputLabel for="idade" value="Idade: " /> 
+			<h:inputText id="idade"
+				value="#{professorCon.professorFoco.idade}"> 
+				<f:convertNumber integerOnly="true" minIntegerDigits="0"/></h:inputText>
+			<h:message for="name"/>
+		
+			<h:outputLabel for="email" value="Email: " /> 
+			<h:inputText id="email"
+				value="#{professorCon.professorFoco.email}"
+				validatorMessage=" Email Invalido!">
+				<f:validateRegex pattern=".+@.+"></f:validateRegex> </h:inputText> 
+			<h:message for="email" />		
+		
+			<h:outputLabel for="formacao" value="Formação: " />
+				<h:inputText id="formacao"
+					value="#{professorCon.professorFoco.formacao}" />
+				<h:message for="formacao"/>			
+				
+			<h:outputLabel for="genero" value="Genero: " />	
+			<h:selectOneRadio id="genero"  required="true"
+				value="#{professorCon.professorFoco.genero}" >
+				<f:selectItems value="#{professorCon.generos()}"
+				 var="g" itemLabel="#{g.descricao}"/></h:selectOneRadio>
+			<h:message for="genero"/>	
+			
+			<h:outputLabel for="turmas" value="Turmas ministradas: " />
+			<h:panelGrid columns="1" rendered="#{professorCon.existente}">
+				<h:dataTable value="#{professorCon.turmasDoProfessor()}" var="t">
+				
+					<h:column>
+						<f:facet name="header">Diciplina</f:facet>
+						#{t.disciplina}
+					</h:column>
+			
+					<h:column>
+						<f:facet name="header">Horario</f:facet>
+						#{t.horario}
+					</h:column>				
+					
+					<h:column>
+				<f:facet name="header">Ações</f:facet>
+				<h:commandLink value="Remover" action="#{professorCon.removerTurma()}">
+					<f:setPropertyActionListener value="#{t}"
+						target="#{professorCon.turmaFoco}">
+					</f:setPropertyActionListener>					
+				</h:commandLink>				
+			</h:column>				
+				</h:dataTable>
+				
+				<h:commandButton action="#{professorCon.mudarMostrarTurmasSisponiveis()}" value="Add..." />
+				
+				<h:dataTable value="#{professorCon.turmasDisponives()}" var="td" rendered="#{professorCon.mostrarTurmasDisponiveis}">
+				
+					<h:column>
+						<f:facet name="header">Diciplina</f:facet>
+						#{td.disciplina}
+					</h:column>
+			
+					<h:column>
+						<f:facet name="header">Horario</f:facet>
+						#{td.horario}
+					</h:column>				
+					
+					<h:column>
+				<f:facet name="header">Ações</f:facet>
+				<h:commandLink value="Cadastrar" action="#{professorCon.cadastrarTurmaAProfessor()}">
+					<f:setPropertyActionListener value="#{td}"
+						target="#{professorCon.turmaFoco}">
+					</f:setPropertyActionListener>					
+				</h:commandLink>				
+			</h:column>				
+				</h:dataTable>
+				
+				</h:panelGrid>
+				<h:outputText rendered="#{!professorCon.existente}" value="#{professorCon.MensagemCampoTurmas()}" />
+				
+			
+				
+		</h:panelGrid>
+		
+
+		<h:commandButton value="Salvar"
+			action="#{professorCon.salvarNovoProfessor()}" />
+		<h:commandButton value="Cancelar"
+			action="#{professorCon.novoProfessor()}" immediate="true" />
+		<br />
+	</h:form>
+	<h:form>
+		<h:dataTable value="#{professorCon.professores}" var="p"
+			rowClasses="linha1, linha2">			
+			<h:column>
+				<f:facet name="header">Nome</f:facet>
+				#{p.nome}
+			</h:column>
+			<h:column>
+				<f:facet name="header">Idade</f:facet>
+				#{p.idade}
+			</h:column>
+			<h:column>
+				<f:facet name="header">Email</f:facet>
+				#{p.email}
+			</h:column>
+			<h:column>
+				<f:facet name="header">Formação</f:facet>
+				#{p.formacao}
+			</h:column>
+			<h:column>
+				<f:facet name="header">Genero</f:facet>
+				#{p.genero}
+			</h:column>
+			<h:column>
+				<f:facet name="header">Ações</f:facet>
+				<h:commandLink value="Editar">
+					<f:setPropertyActionListener value="#{p}"
+						target="#{professorCon.professorFoco}">
+					</f:setPropertyActionListener>
+				</h:commandLink> |<!-- action="" -->
+				<h:commandLink value="Excluir"
+					action="#{professorCon.excluirProfessor()}">
+					<f:setPropertyActionListener value="#{p}"
+						target="#{professorCon.professorFoco}">
+					</f:setPropertyActionListener>
+				</h:commandLink>
+			</h:column>
+		</h:dataTable>
+	</h:form>
+	</ui:composition>
 </html>
