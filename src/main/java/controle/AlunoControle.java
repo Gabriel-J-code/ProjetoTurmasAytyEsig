@@ -2,7 +2,6 @@ package controle;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -77,26 +76,24 @@ public class AlunoControle implements Serializable {
 		
 	}
 	
-	public List<Turma> turmasDoAluno() {		
-		return (List<Turma>) alunoFoco.getTurmasMatriculadas();
+	public Collection<Turma> turmasDoAluno() {		
+		return alunoFoco.getTurmasMatriculadas();
 		
 	}
 	
 	public void removerTurma() {
-		ap.dematricularAlunoDeTurma(alunoFoco, turmaFoco);
+		alunoFoco = ap.dematricularAlunoDeTurma(alunoFoco, turmaFoco);
 		sincronizarDados();
-		alunoFoco = ap.pedarDadosAtualizadosDoAluno(alunoFoco);
 	}
 	
 	public void matricularAlunoATurma() {
 		ap.matricularAlunoATurma(alunoFoco, turmaFoco);
 		sincronizarDados();
-		alunoFoco = ap.pedarDadosAtualizadosDoAluno(alunoFoco);
 	}
 	
-	public List<Turma> turmasDisponiveis() {
+	public Collection<Turma> turmasDisponiveis() {
 		TurmaPercistencia tp = new TurmaPercistencia();
-		List<Turma> turmasDisponiveis =  tp.getTurmas();	
+		Collection<Turma> turmasDisponiveis =  tp.getTurmas();	
 		turmasDisponiveis.removeAll(alunoFoco.getTurmasMatriculadas());
 		return turmasDisponiveis;
 		
@@ -150,6 +147,13 @@ public class AlunoControle implements Serializable {
 		
 	}
 	
+	public String titulo() {
+		if (existente) {
+			return "Atualização de Aluno";
+		} else {
+			return "Cadastro de Novo Aluno";
+		}		
+	}
 	
 	
 	

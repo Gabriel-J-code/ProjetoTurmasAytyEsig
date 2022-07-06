@@ -9,7 +9,7 @@
 		<h:messages infoClass="info" errorClass="erro" warnClass="warn" fatalClass="fatal" />
 	</ui:define>
 	
-	<h1>Cadastro de Professor</h1>
+	<h1>#{professorCon.titulo()}</h1>
     <h:form>
 		<h:panelGrid columnClasses="titleCamp, inputCamp, messageCamp"  columns="3">
 		
@@ -26,9 +26,8 @@
 		
 			<h:outputLabel for="email" value="Email: " /> 
 			<h:inputText id="email"
-				value="#{professorCon.professorFoco.email}"
-				validatorMessage=" Email Invalido!">
-				<f:validateRegex pattern=".+@.+"></f:validateRegex> </h:inputText> 
+				value="#{professorCon.professorFoco.email}">
+				</h:inputText> 
 			<h:message for="email" />		
 		
 			<h:outputLabel for="formacao" value="Formação: " />

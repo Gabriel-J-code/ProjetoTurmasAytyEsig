@@ -16,6 +16,7 @@ public class SalaControle implements Serializable {
 	
 	
 	private Sala salaFoco;
+	private boolean nova = true;
 	private Collection<Sala> salas;
 	
 	
@@ -40,6 +41,7 @@ public class SalaControle implements Serializable {
 	//metodos
 	public void novaSala() {
 		salaFoco = new Sala();		
+		nova = true;
 		sincronizarDados();
 		
 	}
@@ -66,12 +68,26 @@ public class SalaControle implements Serializable {
 	}
 
 	public void setSalaFoco(Sala salaFoco) {
-		this.salaFoco = salaFoco;		
+		this.salaFoco = salaFoco;	
+		nova = false;
 	}
 
 	public Collection<Sala> getSalas() {
 		sincronizarDados();
 		return salas;
+	}
+
+	public boolean isNova() {
+		return nova;
+		
+	}
+	
+	public String titulo() {
+		if(nova) {
+			return "Cadastro de Nova Sala";
+		}else {
+			return "Atualização de Sala";
+		}
 	}
 
 	

@@ -5,7 +5,7 @@ import javax.persistence.metamodel.CollectionAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="Dali", date="2022-07-05T13:55:01.995-0300")
+@Generated(value="Dali", date="2022-07-05T19:56:14.447-0300")
 @StaticMetamodel(Turma.class)
 public class Turma_ {
 	public static volatile SingularAttribute<Turma, Integer> id;

@@ -16,7 +16,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -44,8 +43,7 @@ public class Professor implements Serializable {
 	private int idade;
 	
 	@NotBlank(message = "o email não pode esta em branco")
-	@Column(unique = true)
-	@Max(value = 256, message = "o email tem que ter no maximo 256 caracteres")
+	@Column(unique = true)	
 	@Email(message = "Email invalido!")	
 	private String email;
 	

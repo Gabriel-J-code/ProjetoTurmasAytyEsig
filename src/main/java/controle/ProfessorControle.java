@@ -4,16 +4,14 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 
 import model.Genero;
 import model.Professor;
 import model.Turma;
-import servico.InvalideFieldException;
-import servico.ProfessorServico;
-import servico.TurmaServico;
+import percistencia.ProfessorPercistencia;
+import percistencia.TurmaPercistencia;
 
 @Named("professorCon")
 @ApplicationScoped
@@ -25,8 +23,9 @@ public class ProfessorControle {
 	private Collection<Professor> professores;
 	private Turma turmaFoco;
 	
-	private ProfessorServico ps;
-	private TurmaServico ts;
+	private ProfessorPercistencia pp;
+	private TurmaPercistencia tp;
+	
 
 	public ProfessorControle() {
 		//TODO Auto-generated constructor stub
@@ -34,19 +33,15 @@ public class ProfessorControle {
 	
 	@PostConstruct
 	public void init() {
-		ps = new ProfessorServico();
-		ts = new TurmaServico();
-		professores = ps.listarProfessors();
+		pp = new ProfessorPercistencia();	
+		tp = new TurmaPercistencia();
+		sincronizarDados();
 		novoProfessor();		
 	}
 	
-	@PreDestroy
-	public void exit() {
-		ps.exit();
-	}
-	
+		
 	public void sincronizarDados() {
-		professores = ps.listarProfessors();
+		professores = pp.getProfessores();
 		
 	}
 	
@@ -57,20 +52,18 @@ public class ProfessorControle {
 	}
 	
 	public void salvarNovoProfessor() {
-		try {
-			ps.salvarNovoProfessor(professorFoco);
-		} catch (InvalideFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+		pp.adicionarNovoProfessor(professorFoco);
+		
 		sincronizarDados();
+		novoProfessor();
 	}
 	
 	public void excluirProfessor() {
 		if(professores.contains(professorFoco)) {
-			ps.deletarProfessor(professorFoco);
-			sincronizarDados();
+			pp.deletarProfessor(professorFoco);			
 		}
+		sincronizarDados();
 		novoProfessor();
 	}
 	
@@ -85,7 +78,7 @@ public class ProfessorControle {
 	}
 	
 	public void removerTurma() {
-		ps.desmatricularProfessor(professorFoco, turmaFoco);
+		pp.removerProfessorDaTurma(professorFoco, turmaFoco);
 		sincronizarDados();
 	}
 
@@ -126,16 +119,12 @@ public class ProfessorControle {
 	}
 	
 	public List<Turma> turmasDisponives() {
-		return ts.listarTurmasSemProfessor();
+		
+		return tp.getTurmasSemProfessor();
 	}
 	
 	public void cadastrarTurmaAProfessor() {
-			try {
-				ps.matricularProfessor(professorFoco, turmaFoco);
-			} catch (InvalideFieldException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			tp.cadastrarProfessorATurma(professorFoco, turmaFoco);
 	}
 		
 	
@@ -147,14 +136,13 @@ public class ProfessorControle {
 		}		
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
+	public String titulo() {
+		if(existente) {
+			return "Atualização de Professor";
+		}else {
+			return "Cadastro de Novo Professor";
+		}
+	}
 	
 	
 

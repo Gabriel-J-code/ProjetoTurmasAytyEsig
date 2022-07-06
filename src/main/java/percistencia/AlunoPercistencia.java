@@ -93,7 +93,7 @@ public class  AlunoPercistencia {
 		return encotrado;
 	}
 	
-	public Aluno pedarDadosAtualizadosDoAluno(Aluno aluno) {
+	public Aluno pegarDadosAtualizadosDoAluno(Aluno aluno) {
 		return encontrarPeloId(aluno.getId());	
 	}
 	
@@ -226,17 +226,17 @@ public class  AlunoPercistencia {
 			TurmaPercistencia  tp = new TurmaPercistencia();
 			Turma turmaDB = tp.encontrarPeloId(turma.getId());
 			if(turmaDB != null) {
-				boolean alunoNaListaDaTurma = turmaDB.getAlunos().contains(alunoDB);		
-				boolean turmaNaListaDoAluno = alunoDB.getTurmasMatriculadas().contains(turmaDB);
-				if (!alunoNaListaDaTurma) {
+				boolean alunoNaoEstaNaListaDaTurma = !turmaDB.getAlunos().contains(alunoDB);		
+				boolean turmaNaoEstaNaListaDoAluno = !alunoDB.getTurmasMatriculadas().contains(turmaDB);
+				if (alunoNaoEstaNaListaDaTurma) {
 						turmaDB.getAlunos().add(alunoDB);
 				}
-				if (!turmaNaListaDoAluno) {
+				if (turmaNaoEstaNaListaDoAluno) {
 					alunoDB.getTurmasMatriculadas().add(turmaDB);
 				}				
-				turma = tp.atualizarTurma(turmaDB);
-				tp.getTurmas();
+				tp.atualizarTurma(turmaDB);
 				alunoDB = atualizarAluno(alunoDB);
+				tp.getTurmas();
 				getAlunos();
 			}
 		}		
@@ -244,20 +244,21 @@ public class  AlunoPercistencia {
 	}
 	//Dematricular
 	public Aluno dematricularAlunoDeTurma(Aluno aluno, Turma turma) {
-		
+		int idAluno = aluno.getId();
+		aluno.getTurmasMatriculadas().remove(turma);
+		turma.getAlunos().remove(aluno);
 		try {
 			abrir();
 			em.createNativeQuery(
 					String.format("DELETE FROM tbl_matriculas WHERE id_aluno = %d AND id_turma = %d",
-							aluno.getId(), turma.getId())).executeUpdate();
+							idAluno, turma.getId())).executeUpdate();
 			em.flush();			
 			fechar();
 		} catch (Exception e) {
-			// TODO: handle exception
+			e.printStackTrace();
 		}
 		getAlunos();
-		aluno = encontrarPeloId(aluno.getId());
-		return encontrarPeloId(aluno.getId());
+		return encontrarPeloId(idAluno);
 	}
 	
 		

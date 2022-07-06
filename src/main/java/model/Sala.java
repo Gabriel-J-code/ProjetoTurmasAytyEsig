@@ -21,15 +21,15 @@ public class Sala implements Serializable {
 	private int id;
 	
 	@NotBlank(message = "O campo numero não pode esta em branco.")
-	@Size(min = 1, max = 10)
+	@Size(min = 1, max = 10, message = "O campo numero precisa ter entre 1 e 10 caracteres")
 	private String numero;
 	
 	@NotBlank(message = "O campo predio não pode esta em branco.")
-	@Size(min = 1, max = 50)
+	@Size(min = 1, max = 50, message = "O campo predio precisa ter entre 1 e 50 caracteres")
 	private String predio;
 	
 	@NotBlank(message = "O campo campus não pode esta em branco.")
-	@Size(min = 1, max = 50)
+	@Size(min = 1, max = 50, message = "O campo campus precisa ter entre 1 e 50 caracteres")
 	private String campus;
 
 

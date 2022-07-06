@@ -9,7 +9,7 @@
 		<h:messages infoClass="info" errorClass="erro" warnClass="warn" fatalClass="fatal" />
 	</ui:define>
 	
-<h1>Cadastro de Aluno</h1>
+<h1>#{alunoCon.titulo()}</h1>
 	<h:form>
 		<h:messages />
 		<h:panelGrid columnClasses="titleCamp, inputCamp, messageCamp"  columns="3">
@@ -139,12 +139,20 @@
 				#{a.email}
 			</h:column>
 			<h:column>
+				<f:facet name="header">Curso</f:facet>
+				#{a.curso} 
+			</h:column>
+			<h:column>
 				<f:facet name="header">Matricula</f:facet>
 				#{a.matricula}
 			</h:column>
 			<h:column>
 				<f:facet name="header">Genero</f:facet>
 				#{a.genero}
+			</h:column>
+			<h:column>
+				<f:facet name="header">Total Turmas</f:facet>
+				#{a.turmasMatriculadas.size()}
 			</h:column>
 			<h:column>
 				<f:facet name="header">Ações</f:facet>

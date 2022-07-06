@@ -159,15 +159,14 @@ public class  ProfessorPercistencia {
 	public Professor atualizarProfessor(Professor professor) {
 		Professor p = null;
 		try {
-			em.getTransaction().begin();
+			abrir();
 			p = em.merge(professor);
 			em.flush();
+			fechar();
 		} catch (Exception e) {
 			 em.getTransaction().rollback();
-		}finally {
-			 em.getTransaction().commit();
-			pegarProfessoresOrdenadosPorNome();;			
-		}				
+		}
+		pegarProfessoresOrdenadosPorNome();	
 		return p;
 	}
 	//Deletar
@@ -183,6 +182,19 @@ public class  ProfessorPercistencia {
 			 em.getTransaction().commit();
 			pegarProfessoresOrdenadosPorNome();
 		}
+		return this;
+	}
+
+	public ProfessorPercistencia deletarProfessor(Professor professor) {
+		return deletarProfessorPorId(professor.getId());				
+	}
+
+	public ProfessorPercistencia removerProfessorDaTurma(Professor professor, Turma turma) {
+		if(turma.getProfessor().equals(professor)) {
+			TurmaPercistencia tp = new TurmaPercistencia();
+			tp.removerProfessorDeTurma(turma);
+		}
+		getProfessores();
 		return this;
 	}
 

@@ -10,15 +10,12 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 
 import model.Aluno;
-import model.Genero;
 import model.Professor;
 import model.Sala;
 import model.Turma;
-import servico.AlunoServico;
-import servico.InvalideFieldException;
-import servico.ProfessorServico;
-import servico.SalaServico;
-import servico.TurmaServico;
+import percistencia.ProfessorPercistencia;
+import percistencia.SalaPercistencia;
+import percistencia.TurmaPercistencia;
 
 @Named("turmaCon")
 @ApplicationScoped
@@ -37,29 +34,26 @@ public class TurmaControle implements Serializable {
 	
 	private Collection<Turma> turmas;
 	
+	private TurmaPercistencia tp;
+	private ProfessorPercistencia pp;
+	private SalaPercistencia sp;
 	
-	private AlunoServico as;
-	private TurmaServico ts;
-	private ProfessorServico ps;
-	private SalaServico ss;
-
 	public TurmaControle() {
 		
 	}	
 	
 	@PostConstruct
 	public void init() {
-		as = new AlunoServico();
-		ts = new TurmaServico();
-		ps = new ProfessorServico();
-		ss = new SalaServico();
+		tp = new TurmaPercistencia();
+		pp = new ProfessorPercistencia();	
+		sp = new SalaPercistencia();
 		
 		novaTurma();		
 	}
 	
 		
 	public void sincronizarDados() {
-		turmas = ts.listarTurmas();
+		turmas = tp.getTurmas();
 	}
 	//metodos
 	public void novaTurma() {
@@ -72,21 +66,16 @@ public class TurmaControle implements Serializable {
 		
 	}
 	public void salvarNovaTurma(){
-		try {
-			ts.salvarTurma(turmaFoco);
-		} catch (InvalideFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
+		tp.adicionarNovaTurma(turmaFoco);			
 		novaTurma();
 		
 	}
 	
 	public void excluirTurma() {
 		if(turmas.contains(turmaFoco)) {
-			ts.deletarTurma(turmaFoco);
-			sincronizarDados();
+			tp.deletarTurma(turmaFoco);			
 		}
+		sincronizarDados();
 		novaTurma();
 	}
 	
@@ -126,13 +115,9 @@ public class TurmaControle implements Serializable {
 		return turmas;
 	}
 
-	public Genero[] generos() {
-		return Genero.values();
-		
-	}
-		
+			
 	public void removerAluno() {
-		as.desmatricularTurma(alunoFoco, turmaFoco);
+		tp.dematricularAlunoDeTurma(turmaFoco,alunoFoco);
 		sincronizarDados();
 	}
 	
@@ -192,44 +177,45 @@ public class TurmaControle implements Serializable {
 	}		
 	
 	public List<Professor> professoresDisponiveis() {
-		return ps.listarProfessors();		
+		return pp.getProfessores();		
 	}
-	public void cadastraProfessor() {
-		try {
-			removerProfessor();
-			ts.cadastrarProfessor(turmaFoco, professorFoco);
-		} catch (InvalideFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
+	
+	
+	public void cadastraProfessor() {		
+		removerProfessor();
+		tp.cadastrarProfessorATurma(professorFoco, turmaFoco);				
+		mudarPodeMostrarProfessores();
 		sincronizarDados();
 	}
 	
 	public void removerProfessor() {
-		ts.descastrarProfessor(turmaFoco);
+		tp.removerProfessorDeTurma(turmaFoco);
 		sincronizarDados();
 	}
 	
-	public List<Sala> salasDisponiveis() {
-		return ss.listarSalas();		
+	public List<Sala> salasDisponiveis() {		
+		return sp.getSalas();		
 	}
 	
 	public void registrarSala() {
-		try {
-			ts.cadastrarSala(turmaFoco, salaFoco);
-		} catch (InvalideFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		tp.cadastraSalaATurma(turmaFoco, salaFoco);
 		sincronizarDados();
+		podeMostrarSalas = false;
 	}
 	
 	public void removerSala() {
-		ts.removerSala(turmaFoco);
+		tp.removerSalaDaTurma(turmaFoco);
 		sincronizarDados();
 	}
 	
-	
+	public String titulo() {
+		if(existente) {
+			return "Atualização de Turma";
+		}else {
+			return "Cadatro de Nova Turma";
+		}
+		
+	}
 	
 	
 	

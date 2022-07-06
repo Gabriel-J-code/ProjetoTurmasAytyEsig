@@ -15,7 +15,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 
 import model.Aluno;
@@ -33,6 +32,8 @@ public class  TurmaPercistencia {
 	
 	private static EntityManager em;
 	
+	private AlunoPercistencia ap;
+	
 	static {
 		try {
 			emf = Persistence.createEntityManagerFactory("TurmasAytyEsig");
@@ -44,6 +45,7 @@ public class  TurmaPercistencia {
 	
 	public TurmaPercistencia() {
 		pegarTurmasOrdenadasPorDiciplina();
+		ap = new AlunoPercistencia();
 		
 	}
 	
@@ -225,16 +227,38 @@ public class  TurmaPercistencia {
 			
 	}
 
+	
+	
+	public void cadastrarProfessorATurma(Professor professor, Turma turma) {
+		turma.setProfessor(professor);
+		professor.getTurmasMinistradas().add(turma);
+		atualizarTurma(turma);		
+		
+	}
+
+	public void dematricularAlunoDeTurma(Turma turma, Aluno aluno) {
+		ap.dematricularAlunoDeTurma(aluno, turma);
+		
+	}
+	
+	public void cadastraSalaATurma(Turma turma, Sala sala) {
+		turma.setSala(sala);
+		atualizarTurma(turma);
+		
+	}
+	
 	public void removerSalaDaTurma(Turma turma) {
+		turma.setSala(null);
+		atualizarTurma(turma);
+	}
+	
+	/*public void removerSalaDaTurma(Turma turma) {
 		abrir();
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaUpdate<Turma> update = cb.createCriteriaUpdate(Turma.class);
 		Root<Turma> t = update.from(Turma.class);
 		update.set("sala", null).where(cb.equal(t.get("id"), turma.getId()));
-		em.createQuery(update).executeUpdate();
-		
-		
-	}
-	
+		em.createQuery(update).executeUpdate();		
+	}*/
 		
 }
