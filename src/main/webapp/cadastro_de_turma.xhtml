@@ -2,109 +2,119 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:h="http://java.sun.com/jsf/html"> <ui:composition template="/estrutura.xhtml">
+	xmlns:h="http://java.sun.com/jsf/html"> <ui:composition
+	template="/estrutura.xhtml">
 	<ui:param name="titulo" value="Cadastro de Aluno" />
 	<ui:define name="direita">
-		<h:messages infoClass="info" errorClass="erro" warnClass="warn" fatalClass="fatal" />
+		<h:messages infoClass="info" errorClass="erro" warnClass="warn"
+			fatalClass="fatal" />
 	</ui:define>
-	
-<h1>#{turmaCon.titulo()}</h1>
+
+	<h1>#{turmaCon.titulo()}</h1>
 	<h:form>
 		<h:messages />
-		<h:panelGrid columnClasses="titleCamp, inputCamp, messageCamp"  columns="3">
-		
+		<h:panelGrid columnClasses="titleCamp, inputCamp, messageCamp"
+			columns="3">
+
 			<h:outputLabel for="disciplina" value="Disciplina: " />
-			<h:inputText id="disciplina"
-				value="#{turmaCon.turmaFoco.disciplina}" />
-			<h:message for="disciplina"/>
-		
+			<h:inputText id="disciplina" value="#{turmaCon.turmaFoco.disciplina}" />
+			<h:message for="disciplina" />
+
 			<h:outputLabel for="horario" value="Horario (ex:3T34 4M23): " />
-			<h:inputText id="horario"
-				value="#{turmaCon.turmaFoco.horario}" />
-			<h:message for="horario"/>
-			
-						
+			<h:inputText id="horario" value="#{turmaCon.turmaFoco.horario}" />
+			<h:message for="horario" />
+
+
 			<h:outputLabel for="professor" value="Professor : " />
-				<h:outputText value="-----------" rendered="#{!turmaCon.existente}"/>
-				<h:panelGrid columns="3" rendered="#{turmaCon.existente}">
-					<h:outputLabel for="professor" value="#{turmaCon.turmaFoco.professor.nome}" />
-					<h:commandLink value="Remover" action="#{turmaCon.removerProfessor()}"/>											
-					<h:commandLink value="Mudar" action="#{turmaCon.mudarPodeMostrarProfessores()}"/>	
-				
-				<h:dataTable value="#{turmaCon.professoresDisponiveis()}" var="p" rendered="#{turmaCon.podeMostrarProfessores}">
-				
+			<h:outputText value="-----------" rendered="#{!turmaCon.existente}" />
+			<h:panelGrid columns="3" rendered="#{turmaCon.existente}">
+				<h:outputLabel for="professor"
+					value="#{turmaCon.turmaFoco.professor.nome}" />
+				<h:commandLink value="Remover"
+					action="#{turmaCon.removerProfessor()}" />
+				<h:commandLink value="Mudar"
+					action="#{turmaCon.mudarPodeMostrarProfessores()}" />
+
+				<h:dataTable value="#{turmaCon.professoresDisponiveis()}" var="p"
+					rendered="#{turmaCon.podeMostrarProfessores}">
+
 					<h:column>
 						<f:facet name="header">Nome</f:facet>
 						#{p.nome}
 					</h:column>
-			
+
 					<h:column>
 						<f:facet name="header">Formação</f:facet>
 						#{p.formacao}
-					</h:column>			
-					
+					</h:column>
+
 					<h:column>
 						<f:facet name="header">Total Turmas Ministradas</f:facet>
 						#{p.turmasMinistradas.size()}
-					</h:column>		
-					
+					</h:column>
+
 					<h:column>
-				<f:facet name="header">Ações</f:facet>
-				<h:commandLink value="Registrar" action="#{turmaCon.cadastraProfessor()}">
-					<f:setPropertyActionListener value="#{p}"
-						target="#{turmaCon.professorFoco}">
-					</f:setPropertyActionListener>					
-				</h:commandLink>				
-			</h:column>				
+						<f:facet name="header">Ações</f:facet>
+						<h:commandLink value="Registrar"
+							action="#{turmaCon.cadastraProfessor()}">
+							<f:setPropertyActionListener value="#{p}"
+								target="#{turmaCon.professorFoco}">
+							</f:setPropertyActionListener>
+						</h:commandLink>
+					</h:column>
 				</h:dataTable>
-				
-				</h:panelGrid>
-				<h:outputText value="#{turmaCon.MensagemCampoProfessores()}" />
-					
-				
-				
-				
-				
-				<h:outputLabel for="salas" value="Sala : " />
-				<h:outputText value="-----------" rendered="#{!turmaCon.existente}"/>
-				<h:panelGrid columns="3" rendered="#{turmaCon.existente}">
-					<h:outputLabel for="sala" value="#{turmaCon.turmaFoco.sala.toString()}" />
-					<h:commandLink value="Remover" action="#{turmaCon.removerSala()}"/>								
-					<h:commandLink value="Mudar" action="#{turmaCon.mudarPodeMostrarSalas()}"/>	
-				
-				<h:dataTable value="#{turmaCon.salasDisponiveis()}" var="s" rendered="#{turmaCon.podeMostrarSalas}">
-				
+
+			</h:panelGrid>
+			<h:outputText value="#{turmaCon.MensagemCampoProfessores()}" />
+
+
+
+
+
+			<h:outputLabel for="salas" value="Sala : " />
+			<h:outputText value="-----------" rendered="#{!turmaCon.existente}" />
+			<h:panelGrid columns="3" rendered="#{turmaCon.existente}">
+				<h:outputLabel for="sala"
+					value="#{turmaCon.turmaFoco.sala.toString()}" />
+				<h:commandLink value="Remover" action="#{turmaCon.removerSala()}" />
+				<h:commandLink value="Mudar"
+					action="#{turmaCon.mudarPodeMostrarSalas()}" />
+
+				<h:dataTable value="#{turmaCon.salasDisponiveis()}" var="s"
+					rendered="#{turmaCon.podeMostrarSalas}">
+
 					<h:column>
 						<f:facet name="header">Sala</f:facet>
 						#{s.toString()}
-					</h:column>							
-					
-					<h:column>
-				<f:facet name="header">Ações</f:facet>
-				<h:commandLink value="Registrar" action="#{turmaCon.registrarSala()}">
-					<f:setPropertyActionListener value="#{s}"
-						target="#{turmaCon.salaFoco}">
-					</f:setPropertyActionListener>					
-				</h:commandLink>				
-			</h:column>				
-				</h:dataTable>
-				
-				</h:panelGrid>
-			<h:outputText rendered="#{!turmaCon.existente}" value="#{turmaCon.MensagemCampoSalas()}" />		
-				
-		</h:panelGrid>
-		
-		
+					</h:column>
 
-		<h:commandButton value="Salvar"
-			action="#{turmaCon.salvarNovaTurma()}" />
-		<h:commandButton value="Cancelar"
-			action="#{turmaCon.novaTurma()}" immediate="true" />
+					<h:column>
+						<f:facet name="header">Ações</f:facet>
+						<h:commandLink value="Registrar"
+							action="#{turmaCon.registrarSala()}">
+							<f:setPropertyActionListener value="#{s}"
+								target="#{turmaCon.salaFoco}">
+							</f:setPropertyActionListener>
+						</h:commandLink>
+					</h:column>
+				</h:dataTable>
+
+			</h:panelGrid>
+			<h:outputText rendered="#{!turmaCon.existente}"
+				value="#{turmaCon.MensagemCampoSalas()}" />
+
+		</h:panelGrid>
+
+
+
+		<h:commandButton value="Salvar" action="#{turmaCon.salvarNovaTurma()}" />
+		<h:commandButton value="Cancelar" action="#{turmaCon.novaTurma()}"
+			immediate="true" />
 		<br />
 	</h:form>
 	<h:form>
 		<h:dataTable value="#{turmaCon.tumas}" var="t"
-			rowClasses="linha1, linha2">			
+			rowClasses="linha1, linha2">
 			<h:column>
 				<f:facet name="header">Disciplina</f:facet>
 				#{t.disciplina}
@@ -113,22 +123,22 @@
 				<f:facet name="header">Horario</f:facet>
 				#{t.horario}
 			</h:column>
-			
+
 			<h:column>
 				<f:facet name="header">Professor</f:facet>
 				#{t.professor.nome}
 			</h:column>
-			
+
 			<h:column>
 				<f:facet name="header">Sala</f:facet>
 				#{t.sala.toString()}
 			</h:column>
-			
+
 			<h:column>
 				<f:facet name="header">Total de Alunos</f:facet>
 				#{t.alunos.size()}
 			</h:column>
-			
+
 			<h:column>
 				<f:facet name="header">Ações</f:facet>
 				<h:commandLink value="Editar">
@@ -136,8 +146,7 @@
 						target="#{turmaCon.turmaFoco}">
 					</f:setPropertyActionListener>
 				</h:commandLink> |<!-- action="" -->
-				<h:commandLink value="Excluir"
-					action="#{turmaCon.excluirTurma()}">
+				<h:commandLink value="Excluir" action="#{turmaCon.excluirTurma()}">
 					<f:setPropertyActionListener value="#{t}"
 						target="#{turmaCon.turmaFoco}">
 					</f:setPropertyActionListener>
@@ -145,5 +154,4 @@
 			</h:column>
 		</h:dataTable>
 	</h:form>
-	</ui:composition>
-</html>
+</ui:composition> </html>

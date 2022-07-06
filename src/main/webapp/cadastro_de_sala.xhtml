@@ -1,62 +1,61 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:h="http://java.sun.com/jsf/html" > 
-<ui:composition template="/estrutura.xhtml">
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html">
+	
+	 <ui:composition
+	template="/estrutura.xhtml">
 	<ui:param name="titulo" value="Cadastro de Sala" />
 	<ui:define name="direita">
-	<!--	<h:messages infoClass="info" errorClass="erro" warnClass="warn" fatalClass="fatal" /> -->
+		<!--	<h:messages infoClass="info" errorClass="erro" warnClass="warn" fatalClass="fatal" /> -->
 	</ui:define>
-	
-<h1>#{salaCon.titulo()}</h1>
-	<h:form>		
-		<h:panelGrid columnClasses="titleCamp, inputCamp, messageCamp"  columns="3">
-		
-			<h:outputLabel for="numero" value="Numero: " />
-			<h:inputText id="numero"
-				value="#{salaCon.salaFoco.numero}" />
-			<h:message for="numero"/>
-			
-			<h:outputLabel for="predio" value="Predio: " />
-			<h:inputText id="predio"
-				value="#{salaCon.salaFoco.predio}" />
-			<h:message for="predio"/>
-			
-			<h:outputLabel for="campus" value="Campus: " />
-			<h:inputText id="campus"
-				value="#{salaCon.salaFoco.campus}" />
-			<h:message for="campus"/>	
-			
-			</h:panelGrid>
-		
 
-		<h:commandButton value="Salvar"
-			action="#{salaCon.salvarNovaSala()}" />
-		<h:commandButton value="Cancelar"
-			action="#{salaCon.novaSala()}" immediate="true" />
+	<h1>#{salaCon.titulo()}</h1>
+	<h:form>
+		<h:panelGrid columnClasses="titleCamp, inputCamp, messageCamp"
+			columns="3">
+
+			<h:outputLabel for="numero" value="Numero: " />
+			<h:inputText id="numero" value="#{salaCon.salaFoco.numero}" />
+			<h:message for="numero" />
+
+			<h:outputLabel for="predio" value="Predio: " />
+			<h:inputText id="predio" value="#{salaCon.salaFoco.predio}" />
+			<h:message for="predio" />
+
+			<h:outputLabel for="campus" value="Campus: " />
+			<h:inputText id="campus" value="#{salaCon.salaFoco.campus}" />
+			<h:message for="campus" />
+
+		</h:panelGrid>
+
+
+		<h:commandButton value="Salvar" action="#{salaCon.salvarNovaSala()}" />
+		<h:commandButton value="Cancelar" action="#{salaCon.novaSala()}"
+			immediate="true" />
 		<br />
 	</h:form>
-	
-	
+
+
 	<h:form>
 		<h:dataTable value="#{salaCon.salas}" var="s"
-			rowClasses="linha1, linha2">			
+			rowClasses="linha1, linha2">
 			<h:column>
 				<f:facet name="header">Numero</f:facet>
 				#{s.numero}
 			</h:column>
-			
+
 			<h:column>
 				<f:facet name="header">Predio</f:facet>
 				#{s.predio}
 			</h:column>
-			
+
 			<h:column>
 				<f:facet name="header">Campus</f:facet>
 				#{s.campus}
 			</h:column>
-			
+
 			<h:column>
 				<f:facet name="header">Ações</f:facet>
 				<h:commandLink value="Editar">
@@ -64,8 +63,7 @@
 						target="#{salaCon.salaFoco}">
 					</f:setPropertyActionListener>
 				</h:commandLink> |<!-- action="" -->
-				<h:commandLink value="Excluir"
-					action="#{salaCon.excluirSala()}">
+				<h:commandLink value="Excluir" action="#{salaCon.excluirSala()}">
 					<f:setPropertyActionListener value="#{s}"
 						target="#{salaCon.salaFoco}">
 					</f:setPropertyActionListener>
@@ -73,5 +71,4 @@
 			</h:column>
 		</h:dataTable>
 	</h:form>
-	</ui:composition>
-</html>
+</ui:composition> </html>
