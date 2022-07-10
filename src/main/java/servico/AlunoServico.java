@@ -17,49 +17,21 @@ public class AlunoServico {
 	public void exit() {
 		ap.fechar();
 	}
-	
-	//validar
-	/*private void validarAluno(Aluno aluno) throws InvalideFieldException {
 		
-		if(aluno.getNome()==null ||aluno.getNome()=="") {
-			throw new InvalideFieldException("Alunos com nome em branco; ");
-		}
-		if(aluno.getIdade()<0) {
-			throw new InvalideFieldException("Alunos com idade invalida; ");
-		}
-		if(aluno.getCurso()==null ||aluno.getCurso()=="") {
-			throw new InvalideFieldException("Alunos com curso em branco; ");
-		}
-		if(aluno.getEmail()==null ||aluno.getEmail()=="") {
-			throw new InvalideFieldException("Alunos com email em branco; ");
-		}
-		if(!aluno.getEmail().contains("@")) {
-			throw new InvalideFieldException("Alunos com email invalido; ");
-		}
-		if(aluno.getMatricula()==null ||aluno.getMatricula()=="") {
-			throw new InvalideFieldException("Alunos com matricula em branco; ");
-		}				
-	}*/
-	
 	//matricular
-	public void matricularTurma(Aluno aluno,Turma turma){
+	public void matricularAlunoATurma(Aluno aluno,Turma turma){
 		ap.matricularAlunoATurma(aluno, turma);
 	}	
 	
 	//desmatricular aluno
-	public void desmatricularTurma(Aluno aluno,Turma turma){		
-		ap.dematricularAlunoDeTurma(aluno, turma);
+	public Aluno desmatricularAlunoDeTurma(Aluno aluno,Turma turma){		
+		return ap.dematricularAlunoDeTurma(aluno, turma);
 	}
 			
 	//atualizar
 	public Aluno atualizarAluno(Aluno aluno) {
 		return ap.atualizarAluno(aluno);		
-	}
-	
-	public void salvarNovoAluno(String nome, int idade, String email, String curso, String matricula, Genero genero){
-		Aluno aluno = new Aluno(nome, idade, email, curso, matricula, genero);
-		salvarNovoAluno(aluno);		
-	}
+	}	
 	
 	public void salvarNovoAluno(Aluno aluno){			
 		ap.adicionarNovoAluno(aluno);
@@ -71,12 +43,7 @@ public class AlunoServico {
 	public List<Aluno> procurarAlunoPorNome(String nome){		
 		return ap.consultarAlunoPorNome(nome); //procurarAlunoPorCampo("nome", nome);
 	}
-	
-	//idade
-	public List<Aluno> procurarAlunoPorIdade(int idade){		
-		return ap.consultarAlunoPorIdade(idade);
-	}
-
+		
 	//email
 	public List<Aluno> procurarAlunoPorEmail(String email){		
 		return ap.consultarAlunoPorEmail(email);
@@ -109,6 +76,9 @@ public class AlunoServico {
 	public void deletarAluno(Aluno aluno) {
 		ap.deletarAluno(aluno);
 	}
+
+	
+	
 	
 
 }

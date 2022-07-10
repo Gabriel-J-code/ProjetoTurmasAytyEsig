@@ -21,8 +21,8 @@ public class Sala implements Serializable {
 	private int id;
 	
 	@NotBlank(message = "O campo numero não pode esta em branco.")
-	@Size(min = 1, max = 10, message = "O campo numero precisa ter entre 1 e 10 caracteres")
-	private String numero;
+	@Size(min = 1, max = 30, message = "O campo numero precisa ter entre 1 e 10 caracteres")
+	private String identificacao;
 	
 	@NotBlank(message = "O campo predio não pode esta em branco.")
 	@Size(min = 1, max = 50, message = "O campo predio precisa ter entre 1 e 50 caracteres")
@@ -37,9 +37,9 @@ public class Sala implements Serializable {
 		super();
 	} 
 	
-	public Sala(String numero, String predio, String campus) {
+	public Sala(String identificacao, String predio, String campus) {
 		super();
-		this.numero = numero;
+		this.identificacao = identificacao;
 		this.predio = predio;
 		this.campus = campus;
 	}
@@ -53,12 +53,12 @@ public class Sala implements Serializable {
 		this.id = id;
 	}   
 	
-	public String getNumero() {
-		return this.numero;
+	public String getIdentificacao() {
+		return this.identificacao;
 	}
 
-	public void setNumero(String numero) {
-		this.numero = numero;
+	public void setIdentificacao(String identificacao) {
+		this.identificacao = identificacao;
 	}   
 	
 	public String getPredio() {
@@ -80,13 +80,23 @@ public class Sala implements Serializable {
 	@Override
 		public String toString() {
 			// TODO Auto-generated method stub
-			return String.format("Sala %s, predio: %s, campus: %s.", numero, predio, campus);
+			return String.format("Sala %s, predio: %s, campus: %s.", identificacao, predio, campus);
 		}
 	
 	@Override
 	public boolean equals(Object obj) {
-		// TODO Auto-generated method stub
-		Sala temp = (Sala) obj;
-		return this.id == temp.getId();
+		boolean resultado = false;
+		if (obj.getClass()== Sala.class) {
+			Sala temp = (Sala) obj;
+			if (temp.getId()==id) {
+				resultado = true;
+			}else if (temp.getIdentificacao()==identificacao 
+					&& temp.getPredio()==predio 
+					&& temp.getCampus()==campus) {
+				resultado = true;				
+			}
+		}
+		
+		return resultado;
 	}
 }

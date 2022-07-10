@@ -8,19 +8,15 @@
 			@IMPORT url("estilo.css");
 		</style>
 </h:head> <h:body>
-<h:panelGrid columns="2" style="width: 100%" columnClasses="forty-percent top-alignment, sixty-percent top-alignment">
-	<h:panelGroup >
-	<div id="esquerda"> <ui:include src="/menu.xhtml" /> </div>
-	</h:panelGroup>
+	 <div id="esquerda" > <ui:include src="/menu.xhtml" /> </div>
 	<h:panelGroup>
 	<div id="conteudo"> 	
-			<div id="direita">
-	<ui:insert name="direita">O que vem do lado direito</ui:insert></div> <div
+	 <div
 		id="centro">
 	<ui:insert>O que vem no centro</ui:insert></div> </div>
-	<div id="rodape"> <strong>Projeto Onboarding - AYTY ESIG</strong>
-	<br /> </div>
+	<br/>
 	</h:panelGroup>
-</h:panelGrid>
+	<div id="rodape" style=""> <strong>Projeto Onboarding - AYTY ESIG - GJ</strong> </div>
+
 	<ui:debug />
 </h:body> </html>

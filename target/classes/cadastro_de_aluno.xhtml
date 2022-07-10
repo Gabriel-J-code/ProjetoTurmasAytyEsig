@@ -2,7 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:h="http://java.sun.com/jsf/html"> <ui:composition
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"> <ui:composition
 	template="/estrutura.xhtml">
 	<ui:param name="titulo" value="Cadastro de Aluno" />
 	<ui:define name="direita">
@@ -17,39 +18,41 @@
 			columns="3">
 
 			<h:outputLabel for="nome" value="Nome: " />
-			<h:inputText id="nome" value="#{alunoCon.alunoFoco.nome}" />
-			<h:message for="name" />
-
-			<h:outputLabel for="idade" value="Idade: " />
-			<h:inputText id="idade" value="#{alunoCon.alunoFoco.idade}">
-				<f:convertNumber integerOnly="true" minIntegerDigits="0" />
-			</h:inputText>
-			<h:message for="idade" />
+			<p:inputText id="nome" size="50" value="#{alunoCon.alunoFoco.nome}" />
+			<h:message for="nome" />
+			
+			<h:outputLabel for="nascimento" value="Data de Nascimento: " />
+			<h:form>
+			<p:inputMask id="nascimento" value="#{alunoCon.alunoFoco.data_de_nascimento}" 
+			size="8" mask="99/99/9999">
+				<f:convertDateTime pattern="dd/MM/yyyy"/>			
+			</p:inputMask>	
+			<p:outputLabel value="Idade: #{alunoCon.idadeAlunoFoco} anos" rendered="#{alunoCon.idadeAlunoFoco > -1}"/>
+			</h:form>		
+			<h:message for="nascimento" />
 
 			<h:outputLabel for="email" value="Email: " />
-			<h:inputText id="email" value="#{alunoCon.alunoFoco.email}"
-				validatorMessage=" Email Invalido!">
-				<f:validateRegex pattern=".+@.+"></f:validateRegex>
-			</h:inputText>
+			<p:inputText id="email" size="50" value="#{alunoCon.alunoFoco.email}">
+			</p:inputText>
 			<h:message for="email" />
 
 
 
 			<h:outputLabel for="curso" value="Curso: " />
-			<h:inputText id="curso" value="#{alunoCon.alunoFoco.curso}" />
+			<p:inputText id="curso" size="50" value="#{alunoCon.alunoFoco.curso}" />
 			<h:message for="curso" />
 
-			<h:outputLabel for="matricula" value="Matricula: " />
-			<h:inputText id="matricula" value="#{alunoCon.alunoFoco.matricula}" />
-			<h:message for="matricula" />
-
-
-			<h:outputLabel for="genero" value="Genero: " />
-			<h:selectOneRadio id="genero" required="true"
-				value="#{alunoCon.alunoFoco.genero}">
-				<f:selectItems value="#{alunoCon.generos()}" var="g"
-					itemLabel="#{g.descricao}" />
-			</h:selectOneRadio>
+			<h:outputLabel for="matricula" value="Matricula: "  />					
+			<p:inputText id="matricula" value="#{alunoCon.alunoFoco.matricula}" 
+					size="11" maxlength="11"/>
+			<h:message for="matricula"/>			
+			
+			<h:outputLabel for="genero"  value="Genero: " />
+			<p:selectOneRadio id="genero" required="true" validatorMessage="É precisso escolher um genero"
+				value="#{alunoCon.alunoFoco.genero}" >
+				<f:selectItems value="#{alunoCon.generos()}" var="g" 
+					itemLabel="#{g.descricao}" noSelectionValue="#{alunoCon.generos()[2]}"/>
+			</p:selectOneRadio>
 			<h:message for="genero" />
 
 			<h:outputLabel for="turmas" value="Turmas matriculadas: " />
@@ -122,7 +125,7 @@
 
 
 		<h:commandButton value="Salvar" action="#{alunoCon.salvarNovoAluno()}" />
-		<h:commandButton value="Cancelar" action="#{alunoCon.novoAluno()}"
+		<h:commandButton value="Cancelar" action="#{alunoCon.cancelar()}"
 			immediate="true" />
 		<br />
 	</h:form>
@@ -134,10 +137,12 @@
 				#{a.nome}
 			</h:column>
 			<h:column>
-				<f:facet name="header">Idade</f:facet>
-				#{a.idade}
+				<f:facet name="header">Nascimento</f:facet>
+			 	<h:outputText value="#{a.data_de_nascimento}" >
+					<f:convertDateTime pattern="dd/MM/yyyy" />
+				</h:outputText>
 			</h:column>
-			<h:column>
+			<h:column >
 				<f:facet name="header">Email</f:facet>
 				#{a.email}
 			</h:column>

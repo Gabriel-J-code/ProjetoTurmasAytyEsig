@@ -1,21 +1,29 @@
 package controle;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.SessionScoped;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import model.Genero;
 import model.Professor;
 import model.Turma;
-import percistencia.ProfessorPercistencia;
-import percistencia.TurmaPercistencia;
+import servico.ProfessorServico;
+import servico.TurmaServico;
+
+import java.io.IOException;
+import java.io.Serializable;
 
 @Named("professorCon")
-@ApplicationScoped
-public class ProfessorControle {
+@SessionScoped
+public class ProfessorControle implements Serializable {
 	
 	private Professor professorFoco;
 	private boolean existente = false;
@@ -23,8 +31,9 @@ public class ProfessorControle {
 	private Collection<Professor> professores;
 	private Turma turmaFoco;
 	
-	private ProfessorPercistencia pp;
-	private TurmaPercistencia tp;
+	private ProfessorServico ps;
+	private TurmaServico ts;
+	
 	
 
 	public ProfessorControle() {
@@ -33,15 +42,15 @@ public class ProfessorControle {
 	
 	@PostConstruct
 	public void init() {
-		pp = new ProfessorPercistencia();	
-		tp = new TurmaPercistencia();
+		ps = new ProfessorServico();			
+		ts = new TurmaServico();
 		sincronizarDados();
 		novoProfessor();		
 	}
 	
 		
 	public void sincronizarDados() {
-		professores = pp.getProfessores();
+		professores = ps.listarProfessores();
 		
 	}
 	
@@ -51,20 +60,25 @@ public class ProfessorControle {
 		sincronizarDados();		
 	}
 	
-	public void salvarNovoProfessor() {
-		
-		pp.adicionarNovoProfessor(professorFoco);
-		
+	public void salvarNovoProfessor() {		
+		ps.salvarNovoProfessor(professorFoco);		
 		sincronizarDados();
 		novoProfessor();
+		FacesContext facesContext = FacesContext.getCurrentInstance();	
+		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Professor salvo com sucesso!", ""));
+		
 	}
 	
 	public void excluirProfessor() {
 		if(professores.contains(professorFoco)) {
-			pp.deletarProfessor(professorFoco);			
+			ps.deletarProfessor(professorFoco);			
 		}
 		sincronizarDados();
 		novoProfessor();
+		
+		FacesContext facesContext = FacesContext.getCurrentInstance();	
+		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Professor excluido com sucesso!", ""));
+		
 	}
 	
 	public Genero[] generos() {
@@ -78,7 +92,7 @@ public class ProfessorControle {
 	}
 	
 	public void removerTurma() {
-		pp.removerProfessorDaTurma(professorFoco, turmaFoco);
+		ps.desmatricularProfessor(professorFoco, turmaFoco);
 		sincronizarDados();
 	}
 
@@ -118,13 +132,12 @@ public class ProfessorControle {
 		
 	}
 	
-	public List<Turma> turmasDisponives() {
-		
-		return tp.getTurmasSemProfessor();
+	public List<Turma> turmasDisponives() {		
+		return ts.listarTurmasSemProfessor();
 	}
 	
 	public void cadastrarTurmaAProfessor() {
-			tp.cadastrarProfessorATurma(professorFoco, turmaFoco);
+			ps.matricularProfessor(professorFoco, turmaFoco);
 	}
 		
 	
@@ -144,6 +157,38 @@ public class ProfessorControle {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
+	public int getIdadeProfessorFoco() {
+		if(professorFoco.getData_de_nascimento()==null) {
+			return -1;
+		}
+		Date nascimento = professorFoco.getData_de_nascimento();
+		Date now = new Date(System.currentTimeMillis());
+		int idade =  now.getYear() - nascimento.getYear();	
+		if (nascimento.getMonth() > now.getMonth()) {
+			idade--;			
+		} else {
+			if (nascimento.getMonth() == now.getMonth()) {
+				if(nascimento.getDate() > now.getDate()) {
+					idade--;					
+				}
+			}
+		}
+		return idade;
+	}
 	
+public void cancelar() {
+		
+		novoProfessor();
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+	    try {
+			ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+			FacesContext context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Ação cancelada", ""));
+		} catch (IOException e) {
+			FacesContext context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, e.getLocalizedMessage(), ""));
+		}		
+	}
 
 }

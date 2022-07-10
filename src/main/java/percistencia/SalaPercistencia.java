@@ -13,6 +13,8 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import model.Sala;
+import model.Turma;
+//import model.Turma;
 
 public class SalaPercistencia {
 
@@ -31,20 +33,11 @@ public class SalaPercistencia {
 	}
 
 	public SalaPercistencia() {
-		pegarSalasOrdenadosPorNumero();
+		pegarSalasOrdenadasPelaIdentificacao();
 	}
 
 	public void onListaSalasChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Sala sala) {
-		pegarSalasOrdenadosPorNumero();
-	}
-
-	private void pegarSalasOrdenadosPorNumero() {
-		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery<Sala> criteria = cb.createQuery(Sala.class);
-		Root<Sala> sala = criteria.from(Sala.class);
-
-		criteria.select(sala).orderBy(cb.asc(sala.get("numero")));
-		salas = em.createQuery(criteria).getResultList();
+		pegarSalasOrdenadasPelaIdentificacao();
 	}
 
 	private SalaPercistencia abrir() {
@@ -62,38 +55,37 @@ public class SalaPercistencia {
 		try {
 			abrir();
 			em.persist(sala);
+			fechar();
 		} catch (Exception e) {
 			em.getTransaction().rollback();
-		} finally {
-			fechar();
-			pegarSalasOrdenadosPorNumero();
+		} finally {			
+			pegarSalasOrdenadasPelaIdentificacao();
 		}
 		return this;
+	}
+
+	private void pegarSalasOrdenadasPelaIdentificacao() {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Sala> criteria = cb.createQuery(Sala.class);
+		Root<Sala> sala = criteria.from(Sala.class);
+	
+		criteria.select(sala).orderBy(cb.asc(sala.get("identificacao")));
+		salas = em.createQuery(criteria).getResultList();
 	}
 
 	// LER
 	// todos
 	public List<Sala> getSalas() {
+		pegarSalasOrdenadasPelaIdentificacao();
 		return salas;
 	}
 
 	// por id
-	public Sala encontrarSalaPeloId(int id) {
-		Sala salaEncontrada = null;
-		if (em.isOpen()) {
-			salaEncontrada = em.find(Sala.class, id);
-		}
+	public Sala encontrarSalaPeloId(int id) {		
+		Sala salaEncontrada = em.find(Sala.class, id);		
 		return salaEncontrada;
 	}
-
-	public List<Sala> consultaSQL(String sql) {
-		abrir();
-		@SuppressWarnings("unchecked")
-		List<Sala> Salas = em.createQuery(sql).getResultList();
-		fechar();
-		return Salas;
-	}
-
+	
 	private List<Sala> consultarSalaPorCampo(String campo, String valor) {
 		List<Sala> resultadoConsultaSalas = new ArrayList<Sala>();
 		CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -113,7 +105,7 @@ public class SalaPercistencia {
 
 	// numero
 	public List<Sala> contultarSalaPorNumero(String numero) {
-		return consultarSalaPorCampo("numero", numero);
+		return consultarSalaPorCampo("identificacao", numero);
 	}
 
 	// predio
@@ -127,39 +119,44 @@ public class SalaPercistencia {
 	}
 
 	// Atualizar
-	public Sala atualizarSala(Sala Sala) {
-		Sala s = null;
+	public Sala atualizarSala(Sala sala) {
+		
 		try {
 			abrir();
-			s = em.merge(Sala);
-			em.flush();
+			sala = em.merge(sala);
 			fechar();
 		} catch (Exception e) {
 			em.getTransaction().rollback();
-		} finally {
-
-			pegarSalasOrdenadosPorNumero();
 		}
-		return s;
+		pegarSalasOrdenadasPelaIdentificacao();
+		return sala;
 	}
 
 	// Deletar
-	public SalaPercistencia deleteSalaPorId(int id) {
+	
+	public SalaPercistencia deletarSalaPorId(int id) {
 		try {
 			abrir();
-			SalaPercistencia sp = new SalaPercistencia();
-			Sala s = sp.encontrarSalaPeloId(id);			
-			em.remove(em.contains(s) ? s : em.merge(s));
+			Sala sala = encontrarSalaPeloId(id);
+			sala = em.merge(sala);		
+			//remover sala de turmas que a usam
+			TurmaPercistencia tp = new TurmaPercistencia();
+			for(Turma turma : tp.consultarTurmaPorSala(sala)) {
+				turma = em.merge(turma);
+				turma.setSala(null);
+				em.flush();
+			}
+			em.remove(em.contains(sala)? sala : em.merge(sala));
 			fechar();
 		} catch (Exception e) {
 			em.getTransaction().rollback();
 		}
-		pegarSalasOrdenadosPorNumero();
+		pegarSalasOrdenadasPelaIdentificacao();
 		return this;
 	}
-
+	
 	public SalaPercistencia deleteSala(Sala sala) {
-		return deleteSalaPorId(sala.getId());
+		return deletarSalaPorId(sala.getId());
 	}
 
 }

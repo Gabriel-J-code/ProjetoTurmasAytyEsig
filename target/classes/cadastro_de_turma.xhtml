@@ -2,9 +2,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:h="http://java.sun.com/jsf/html"> <ui:composition
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"> <ui:composition
 	template="/estrutura.xhtml">
-	<ui:param name="titulo" value="Cadastro de Aluno" />
+	<ui:param name="titulo" value="Cadastro de Turma" />
 	<ui:define name="direita">
 		<h:messages infoClass="info" errorClass="erro" warnClass="warn"
 			fatalClass="fatal" />
@@ -17,11 +18,11 @@
 			columns="3">
 
 			<h:outputLabel for="disciplina" value="Disciplina: " />
-			<h:inputText id="disciplina" value="#{turmaCon.turmaFoco.disciplina}" />
+			<p:inputText id="disciplina" value="#{turmaCon.turmaFoco.disciplina}" />
 			<h:message for="disciplina" />
 
 			<h:outputLabel for="horario" value="Horario (ex:3T34 4M23): " />
-			<h:inputText id="horario" value="#{turmaCon.turmaFoco.horario}" />
+			<p:inputText id="horario" value="#{turmaCon.turmaFoco.horario}" />
 			<h:message for="horario" />
 
 
@@ -108,7 +109,7 @@
 
 
 		<h:commandButton value="Salvar" action="#{turmaCon.salvarNovaTurma()}" />
-		<h:commandButton value="Cancelar" action="#{turmaCon.novaTurma()}"
+		<h:commandButton value="Cancelar" action="#{turmaCon.cancelar()}"
 			immediate="true" />
 		<br />
 	</h:form>

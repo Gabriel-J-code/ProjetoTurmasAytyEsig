@@ -32,8 +32,6 @@ public class  TurmaPercistencia {
 	
 	private static EntityManager em;
 	
-	private AlunoPercistencia ap;
-	
 	static {
 		try {
 			emf = Persistence.createEntityManagerFactory("TurmasAytyEsig");
@@ -44,33 +42,20 @@ public class  TurmaPercistencia {
 	}
 	
 	public TurmaPercistencia() {
-		pegarTurmasOrdenadasPorDiciplina();
-		ap = new AlunoPercistencia();
+		pegarTurmasOrdenadasPorDiciplina();	
 		
 	}
 	
-	public void onListaTurmasChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Turma turma) {
-		pegarTurmasOrdenadasPorDiciplina();
-    }
-	@PostConstruct
-	private void pegarTurmasOrdenadasPorDiciplina() {
-		CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Turma> criteria = cb.createQuery(Turma.class);
-        Root<Turma> turma = criteria.from(Turma.class);       
-        criteria.select(turma).orderBy(cb.asc(turma.get("disciplina")));
-        turmas = em.createQuery(criteria).getResultList();
-	}
-
 	private TurmaPercistencia abrir() {
 		em.getTransaction().begin();
 		return this;
 	}
-	
+
 	private TurmaPercistencia fechar() {		
 		em.getTransaction().commit();
 		return this;
 	}
-	
+
 	//Criar
 	public TurmaPercistencia adicionarNovaTurma(Turma entidade) {
 		try {
@@ -85,7 +70,19 @@ public class  TurmaPercistencia {
 		}
 		return this;
 	}
-	
+
+	public void onListaTurmasChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Turma turma) {
+		pegarTurmasOrdenadasPorDiciplina();
+    }
+	@PostConstruct
+	private void pegarTurmasOrdenadasPorDiciplina() {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Turma> criteria = cb.createQuery(Turma.class);
+        Root<Turma> turma = criteria.from(Turma.class);       
+        criteria.select(turma).orderBy(cb.asc(turma.get("disciplina")));
+        turmas = em.createQuery(criteria).getResultList();
+	}
+
 	//LER
 	//todos
 	public List<Turma> getTurmas() {
@@ -144,7 +141,7 @@ public class  TurmaPercistencia {
 			.where(cb.equal(turma.get("sala"), sala))
 			.orderBy(cb.asc(turma.get("disciplina")));
 		resultadoConsultaTurmas.addAll(em.createQuery(criteria).getResultList());
-		return null;
+		return resultadoConsultaTurmas;
 		
 	}
 		
@@ -171,24 +168,6 @@ public class  TurmaPercistencia {
 	}
 	
 	
-	//Deletar
-	public TurmaPercistencia deletarTurmaPorId(int id) {
-		try {
-			abrir();
-			TurmaPercistencia dao = new TurmaPercistencia();
-			Turma obj = dao.encontrarPeloId(id);
-			em.remove(em.contains(obj) ? obj : em.merge(obj));
-			fechar();
-		} catch (Exception e) {
-			em.getTransaction().rollback();
-		}		
-		return this;
-	}
-	
-	public TurmaPercistencia deletarTurma(Turma turma) {
-		return deletarTurmaPorId(turma.getId());
-	}
-
 	public List<Turma> getTurmasSemProfessor() {
 		List<Turma> resultadoConsultaTurmas = new ArrayList<Turma>();
 		CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -198,7 +177,7 @@ public class  TurmaPercistencia {
 			.where(cb.isNull(turma.get("professor")))
 			.orderBy(cb.asc(turma.get("disciplina")));
 		resultadoConsultaTurmas.addAll(em.createQuery(criteria).getResultList());
-		return null;
+		return resultadoConsultaTurmas;
 	}
 	
 	public void removerProfessorDeTurma(Turma turma) {
@@ -235,11 +214,6 @@ public class  TurmaPercistencia {
 		atualizarTurma(turma);		
 		
 	}
-
-	public void dematricularAlunoDeTurma(Turma turma, Aluno aluno) {
-		ap.dematricularAlunoDeTurma(aluno, turma);
-		
-	}
 	
 	public void cadastraSalaATurma(Turma turma, Sala sala) {
 		turma.setSala(sala);
@@ -250,6 +224,35 @@ public class  TurmaPercistencia {
 	public void removerSalaDaTurma(Turma turma) {
 		turma.setSala(null);
 		atualizarTurma(turma);
+	}
+
+	//Deletar
+	public TurmaPercistencia deletarTurmaPorId(int id) {
+		try {
+			abrir();			
+			Turma turma = encontrarPeloId(id);
+			turma = em.merge(turma);
+			//removendo provessor da turma
+			Professor professor = em.merge( turma.getProfessor());
+			professor.getTurmasMinistradas().remove(turma);
+			turma.setProfessor(null);
+			//removendo alunos da turma
+			for (Aluno aluno : turma.getAlunos()) {
+				aluno = em.merge(aluno);
+				aluno.getTurmasMatriculadas().remove(turma);
+				turma.getAlunos().remove(aluno);
+			}			
+			em.remove(em.contains(turma) ? turma : em.merge(turma));
+			fechar();
+		} catch (Exception e) {
+			em.getTransaction().rollback();
+		}	
+		pegarTurmasOrdenadasPorDiciplina();
+		return this;
+	}
+
+	public TurmaPercistencia deletarTurma(Turma turma) {
+		return deletarTurmaPorId(turma.getId());
 	}
 	
 	/*public void removerSalaDaTurma(Turma turma) {

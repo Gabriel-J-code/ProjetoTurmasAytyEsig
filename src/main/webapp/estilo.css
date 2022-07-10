@@ -7,7 +7,7 @@ body {
 #esquerda {
 	margin-left: 10px;
 	float:top;
-	width: 205px;
+	width: 250px;
 	background-color: #EDD;
 	padding: 5px;
 	border-radius: 15px;
@@ -54,9 +54,9 @@ body {
 #rodape {
 	background-color: #333;
 	color: #FFF;
-	height: 30px;
+	height: 15px;
 	padding: 10px;
-	position: fixed;
+	position: relative;
 	bottom: 0;
 	width: 100%;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#999), to(#333) );
@@ -80,6 +80,13 @@ table {
 	width: 70%
 }
 
+td.titleCamp{
+	width: min-content;
+}
+
+td.inputCamp{
+	width: auto;
+}
 tr>th {
 	background-color: #DDD;
 }

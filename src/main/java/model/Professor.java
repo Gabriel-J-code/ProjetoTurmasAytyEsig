@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.lang.String;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -15,12 +15,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
-
 /**
  * Entity implementation class for Entity: Professor
  *
@@ -35,12 +36,13 @@ public class Professor implements Serializable {
 	private int id;
 	
 	@NotBlank(message = "P professor tem que ter um nome")
-	@Size(min = 1, max = 100, message = "O nome do professor tem que entre 1 e 100 caracteres")
 	@Pattern(regexp = "[^0-9]*" , message = "Não pode conter numeros!")
 	private String nome;
 	
-	@Min(value = 0, message = "A idade precisa conter um valor maior que 0.")
-	private int idade;
+	@Temporal(TemporalType.DATE)
+	@Past
+	@NotNull(message = "O campo data de nascimento não pode ser vazio")
+	private Date data_de_nascimento;
 	
 	@NotBlank(message = "o email não pode esta em branco")
 	@Column(unique = true)	
@@ -53,7 +55,7 @@ public class Professor implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private Genero genero;
 	
-	@OneToMany(mappedBy = "professor",cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "professor")
 	private Collection<Turma> turmasMinistradas;
 
 
@@ -61,10 +63,9 @@ public class Professor implements Serializable {
 		this.turmasMinistradas = new ArrayList<Turma>();
 	}   
 	
-	public Professor(String nome, int idade, String email, String formacao, Genero genero) {
+	public Professor(String nome, String email, String formacao, Genero genero) {
 		super();
 		this.nome = nome;
-		this.idade = idade;
 		this.email = email;
 		this.formacao = formacao;
 		this.genero = genero;
@@ -86,14 +87,14 @@ public class Professor implements Serializable {
 	public void setNome(String nome) {
 		this.nome = nome;
 	}   
-	
-	public int getIdade() {
-		return this.idade;
+		
+	public Date getData_de_nascimento() {
+		return data_de_nascimento;
 	}
 
-	public void setIdade(int idade) {
-		this.idade = idade;
-	}   
+	public void setData_de_nascimento(Date data_de_nascimento) {
+		this.data_de_nascimento = data_de_nascimento;
+	}
 	
 	public String getEmail() {
 		return this.email;

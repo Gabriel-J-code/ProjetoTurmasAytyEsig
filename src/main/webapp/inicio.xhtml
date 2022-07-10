@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"> 
+	
+	<ui:composition	template="/estrutura.xhtml">
+	<ui:param name="titulo" value="Cadastro de Aluno" />
+	<ui:define name="direita">
+		<h:messages infoClass="info" errorClass="erro" warnClass="warn"
+			fatalClass="fatal" />
+	</ui:define>
+
+		<h1>Gestão de Turmas</h1>
+		<h2>Um Projeto Onboarding AYTY ESIG</h2>
+		<h:panelGrid columns="1" width="50px">
+			<h:outputLabel value="Total de Alunos Registrados: #{alunoCon.alunos.size()}" />			
+			
+			<h:outputLabel value="Total de Professores Registrados: #{professorCon.professores.size()}" />
+			
+			<h:outputLabel value="Total de Turmas Registradas: #{turmaCon.tumas.size()}" />
+			
+			<h:outputLabel value="Total de Salas Registradas: #{salaCon.salas.size()}" />
+		</h:panelGrid>
+	
+	</ui:composition> 
+</html>

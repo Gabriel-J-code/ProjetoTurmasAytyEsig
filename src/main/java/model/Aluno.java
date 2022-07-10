@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.lang.String;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,11 +16,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 
 @Entity
@@ -32,12 +35,13 @@ public class Aluno implements Serializable {
 	private int id;
 	
 	@NotBlank(message = "O campo nome não pode estar em branco")
-	@Size(min = 1, max = 100, message = "o nome tem que ter entre 1 e 100 caracteres")
 	@Pattern(regexp = "[^0-9]*" , message = "Não pode conter numeros!")
 	private String nome;
 	
-	@Min(value = 0, message = "A idade precisa conter um valor maior que 0!")
-	private int idade;
+	@Temporal(TemporalType.DATE)
+	@Past
+	@NotNull(message = "O campo data de nascimento não pode ser vazio")
+	private Date data_de_nascimento;
 	
 	@NotBlank(message = "O campo email não pode estar em branco")
 	@Column(unique = true)
@@ -61,19 +65,23 @@ public class Aluno implements Serializable {
 	public Aluno() {
 		turmasMatriculadas = new ArrayList<Turma>();
 	}  
+		
 	
-	public Aluno(String nome, int idade, String email, String curso, String matricula, Genero genero) {
+	public Aluno(
+			@NotBlank(message = "O campo nome não pode estar em branco") @Pattern(regexp = "[^0-9]*", message = "Não pode conter numeros!") String nome,
+			Date data_de_nascimento,
+			@NotBlank(message = "O campo email não pode estar em branco") @Email(message = "Email invalido!") String email,
+			@NotBlank(message = "O campo curso não pode estar em branco") String curso,
+			@NotBlank(message = "O campo matricula não pode estar em branco") String matricula, Genero genero) {
 		super();
 		this.nome = nome;
-		this.idade = idade;
+		this.data_de_nascimento = data_de_nascimento;
 		this.email = email;
 		this.curso = curso;
 		this.matricula = matricula;
 		this.genero = genero;
-		turmasMatriculadas = new ArrayList<Turma>();
 	}
-	
-	
+
 	public int getId() {
 		return this.id;
 	}
@@ -90,12 +98,12 @@ public class Aluno implements Serializable {
 		this.nome = nome;
 	}  
 	
-	public int getIdade() {
-		return this.idade;
+	public Date getData_de_nascimento() {
+		return data_de_nascimento;
 	}
 
-	public void setIdade(int idade) {
-		this.idade = idade;
+	public void setData_de_nascimento(Date data_de_nascimento) {
+		this.data_de_nascimento = data_de_nascimento;
 	}
 	
 	public String getEmail() {
@@ -141,7 +149,7 @@ public class Aluno implements Serializable {
 	@Override
 	public String toString() {
 		
-		return String.format("(%d) nome: %s; idade: %d, genero %s", getId(),getNome(), getIdade(), getGenero().name());
+		return String.format("(%d) nome: %s; nascimento: %s, genero %s", getId(),getNome(), getData_de_nascimento().toString(), getGenero().name());
 	}
 	
 	@Override

@@ -2,6 +2,7 @@ package percistencia;
 
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.enterprise.event.Observes;
@@ -88,13 +89,13 @@ public class  AlunoPercistencia {
 		return alunos;
 	}
 	//por id
-	private Aluno encontrarPeloId(int id) {
+	private Aluno encontrarAlunoPeloId(int id) {
 		Aluno encotrado = em.find(Aluno.class, id);				
 		return encotrado;
 	}
 	
 	public Aluno pegarDadosAtualizadosDoAluno(Aluno aluno) {
-		return encontrarPeloId(aluno.getId());	
+		return encontrarAlunoPeloId(aluno.getId());	
 	}
 	
 	//	
@@ -122,12 +123,12 @@ public class  AlunoPercistencia {
 		return consultarAlunoPorCampo("nome", nome);
 	}
 	//idade
-	public List<Aluno> consultarAlunoPorIdade(int idade) {
+	public List<Aluno> consultarAlunoPorIdade(Date nascimento) {
 		ArrayList<Aluno> resultadoConsultaAlunos = new ArrayList<Aluno>();
 		CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Aluno> criteria = cb.createQuery(Aluno.class);
         Root<Aluno> aluno = criteria.from(Aluno.class);
-        criteria.select(aluno).where(cb.equal(aluno.get("idade"), idade)).orderBy(cb.asc(aluno.get("nome")));
+        criteria.select(aluno).where(cb.equal(aluno.get("idade"), nascimento)).orderBy(cb.asc(aluno.get("nome")));
         resultadoConsultaAlunos.addAll(em.createQuery(criteria).getResultList());
         return resultadoConsultaAlunos;
 	}
@@ -155,11 +156,32 @@ public class  AlunoPercistencia {
 		return consultarAlunoPorGenero(genero.name());
 	}	
 	
+	public List<String> listarMatriculas() {
+		ArrayList<String> resultadoConsultaMatriculas = new ArrayList<String>();
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<String> criteria = cb.createQuery(String.class);
+        Root<Aluno> aluno = criteria.from(Aluno.class);
+        criteria.select(aluno.get("matricula")).orderBy(cb.asc(aluno.get("matricula")));
+        resultadoConsultaMatriculas.addAll(em.createQuery(criteria).getResultList());
+        return resultadoConsultaMatriculas;
+	}
+	
+	public List<String> listarMatriculasDoAno(String ano) {
+		ArrayList<String> resultadoConsultaMatriculas = new ArrayList<String>();
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<String> criteria = cb.createQuery(String.class);
+        Root<Aluno> aluno = criteria.from(Aluno.class);
+        criteria.select(aluno.get("matricula"))
+        			.where(cb.like(aluno.get("matricula"), ano + "%"))
+        				.orderBy(cb.asc(aluno.get("matricula")));
+        resultadoConsultaMatriculas.addAll(em.createQuery(criteria).getResultList());
+        return resultadoConsultaMatriculas;
+	}
 	//turmas
 	
 	
 	private List<Turma> listarTurmasDoId(int idAluno) {		
-		Aluno aluno = encontrarPeloId(idAluno);		
+		Aluno aluno = encontrarAlunoPeloId(idAluno);		
         return (List<Turma>) aluno.getTurmasMatriculadas();
         		
 	}
@@ -181,26 +203,30 @@ public class  AlunoPercistencia {
 	
 	//Atualizar
 	public Aluno atualizarAluno(Aluno aluno) {
-		Aluno a = null;
+		
 			try {
 				abrir();				
-				a = em.merge(aluno);
+				aluno = em.merge(aluno);
 				fechar();
 			} catch (Exception e) {
 				 em.getTransaction().rollback();
 			}finally {				
 				pegarAlunosOrdenadosPorNome();
 			}				
-		return a;
+		return aluno;
 			
 	}
 	//Deletar
 	private AlunoPercistencia deletarAlunoPorId(int id) {
 		try {
 			abrir();
-			Aluno alunoDB = encontrarPeloId(id);
+			Aluno alunoDB = encontrarAlunoPeloId(id);
+			alunoDB = em.merge(alunoDB);
 			for (Turma turma : alunoDB.getTurmasMatriculadas()) {
-				dematricularAlunoDeTurma(alunoDB, turma);				
+				turma = em.merge(turma);
+				alunoDB.getTurmasMatriculadas().remove(turma);
+				turma.getAlunos().remove(alunoDB);
+				em.flush();
 			}
 			em.remove(em.contains(alunoDB) ? alunoDB : em.merge(alunoDB));
 			fechar();
@@ -221,7 +247,7 @@ public class  AlunoPercistencia {
 	
 	//Matricular
 	public Aluno matricularAlunoATurma(Aluno aluno, Turma turma) {
-		Aluno alunoDB = encontrarPeloId(aluno.getId());
+		Aluno alunoDB = encontrarAlunoPeloId(aluno.getId());
 		if (alunoDB != null) {
 			TurmaPercistencia  tp = new TurmaPercistencia();
 			Turma turmaDB = tp.encontrarPeloId(turma.getId());
@@ -243,22 +269,23 @@ public class  AlunoPercistencia {
 		return alunoDB;	
 	}
 	//Dematricular
-	public Aluno dematricularAlunoDeTurma(Aluno aluno, Turma turma) {
-		int idAluno = aluno.getId();
-		aluno.getTurmasMatriculadas().remove(turma);
-		turma.getAlunos().remove(aluno);
+	public Aluno dematricularAlunoDeTurma(Aluno aluno, Turma turma) {		
 		try {
 			abrir();
-			em.createNativeQuery(
+			aluno = em.merge(aluno);
+			turma = em.merge(turma);
+			aluno.getTurmasMatriculadas().remove(turma);
+			turma.getAlunos().remove(aluno);
+			/*em.createNativeQuery(
 					String.format("DELETE FROM tbl_matriculas WHERE id_aluno = %d AND id_turma = %d",
-							idAluno, turma.getId())).executeUpdate();
-			em.flush();			
+							idAluno, turma.getId())).executeUpdate();*/
+					
 			fechar();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		getAlunos();
-		return encontrarPeloId(idAluno);
+		return aluno;
 	}
 	
 		

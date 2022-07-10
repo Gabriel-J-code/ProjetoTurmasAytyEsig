@@ -3,7 +3,6 @@ package servico;
 import java.util.List;
 
 import model.Turma;
-import model.Aluno;
 import model.Professor;
 import model.Sala;
 import percistencia.AlunoPercistencia;
@@ -27,74 +26,37 @@ public class TurmaServico {
 		ap.fechar();
 	}
 	
-	//validar
-	private void validarTurma(Turma turma) throws InvalideFieldException {
 		
-		if(turma.getDisciplina()==null ||turma.getDisciplina()=="") {
-			throw new InvalideFieldException("Turma com disciplina em branco; ");
-		}
-		if(turma.getHorario()==null ||turma.getHorario()=="") {
-			throw new InvalideFieldException("Turma com horario em branco; ");
-		}
-		
-					
-	}
-	
-	
-	
 	//criar
-	public void salvarTurma(Turma turma) throws InvalideFieldException {
-		validarTurma(turma);
+	public void salvarTurma(Turma turma){		
 		tp.adicionarNovaTurma(turma);		
 	}
 	
-	public void criarTurma(String disciplina, String horario) throws InvalideFieldException {
+	public void criarTurma(String disciplina, String horario){
 		Turma turma = new Turma(disciplina, horario);
 		salvarTurma(turma);		
 	}
 	
-	//cadastarProfessor
-	public void cadastrarProfessor(Turma turma, Professor professor) throws InvalideFieldException {
-		validarTurma(turma);
-		turma.setProfessor(professor);
-		professor.getTurmasMinistradas().add(turma);
-		tp.atualizarTurma(turma);
-		pp.atualizarProfessor(professor);				
+	//cadastarProfessor		
+	public void cadastrarProfessorATurma(Professor professor, Turma turma) {
+		tp.cadastrarProfessorATurma(professor, turma);
+		
 	}
-	
+
 	public void descastrarProfessor(Turma turma) {
 		tp.removerProfessorDeTurma(turma);
 	}
 	
 	//cadastrarSala
-	public void cadastrarSala(Turma turma, Sala sala) throws InvalideFieldException {
+	public void cadastrarSala(Turma turma, Sala sala){
 		turma.setSala(sala);
 		tp.atualizarTurma(turma);				
 	}
 	
 	public void removerSala(Turma turma) {
 		//tp.removerSalaDaTurma(turma);
-		turma.setSala(null);
-		tp.atualizarTurma(turma);
+		tp.removerSalaDaTurma(turma);
 	}
-	
-	//matricular
-		public void matricularAluno(Turma turma, Aluno aluno) throws InvalideFieldException {
-			validarTurma(turma);
-			turma.getAlunos().add(aluno);
-			aluno.getTurmasMatriculadas().add(turma);
-			tp.atualizarTurma(turma);
-			ap.atualizarAluno(aluno);
-			
-		}	
-		
-		public void desmatricularAluno(Turma turma, Aluno aluno){		
-			aluno.getTurmasMatriculadas().remove(turma);
-			turma.getAlunos().remove(aluno);		
-			tp.atualizarTurma(turma);
-			ap.atualizarAluno(aluno);
-		}
-	//pegar
 	
 	//id
 	public Turma procurarTurmaPorId(Integer id) {

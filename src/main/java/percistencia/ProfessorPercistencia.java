@@ -119,18 +119,6 @@ public class  ProfessorPercistencia {
 		return consultarProfessorPorCampo("nome", nome);
 	}
 	
-	public List<Professor> consultarProfessorPorIdade(int idade){		
-		ArrayList<Professor> resultadoConsultaProfessores = new ArrayList<Professor>();
-		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery<Professor> criteria = cb.createQuery(Professor.class);
-		Root<Professor> professor = criteria.from(Professor.class);
-		criteria.select(professor)
-			.where(cb.equal(professor.get("idade"), idade))
-			.orderBy(cb.asc(professor.get("idade")));
-		resultadoConsultaProfessores.addAll(em.createQuery(criteria).getResultList());					
-		return resultadoConsultaProfessores;
-	}
-	
 	public List<Professor> consultarProfessorPorEmail(String email){		
 		return consultarProfessorPorCampo("email", email);
 	}
@@ -172,16 +160,21 @@ public class  ProfessorPercistencia {
 	//Deletar
 	public ProfessorPercistencia deletarProfessorPorId(int id) {
 		try {
-			em.getTransaction().begin();			
-			Professor obj = encontrarPeloId(id);
-			em.remove(em.contains(obj) ? obj : em.merge(obj));
-			 
+			abrir()	;		
+			Professor professor = encontrarPeloId(id);
+			professor = em.merge(professor);
+			for(Turma turma : professor.getTurmasMinistradas()) {
+				turma = em.merge(turma);
+				turma.setProfessor(null);
+				professor.getTurmasMinistradas().remove(turma);
+			}
+			em.remove(em.contains(professor) ? professor : em.merge(professor));
+			fechar();
 		} catch (Exception e) {
 			 em.getTransaction().rollback();
-		}finally {
-			 em.getTransaction().commit();
-			pegarProfessoresOrdenadosPorNome();
 		}
+			 
+		pegarProfessoresOrdenadosPorNome();		
 		return this;
 	}
 

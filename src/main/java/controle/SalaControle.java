@@ -1,17 +1,22 @@
 package controle;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.SessionScoped;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import model.Sala;
-import percistencia.SalaPercistencia;
+import servico.SalaServico;
 
 @Named("salaCon")
-@ApplicationScoped
+@SessionScoped
 public class SalaControle implements Serializable {
 	
 	
@@ -19,9 +24,7 @@ public class SalaControle implements Serializable {
 	private boolean nova = true;
 	private Collection<Sala> salas;
 	
-	
-	private SalaPercistencia sp;
-	
+	private SalaServico ss;
 
 	public SalaControle() {
 		
@@ -29,14 +32,14 @@ public class SalaControle implements Serializable {
 	
 	@PostConstruct
 	public void init() {
-		sp = new SalaPercistencia();
+		ss = new SalaServico();
 		sincronizarDados();
 		novaSala();		
 	}
 	
 		
 	public void sincronizarDados() {
-		salas = sp.getSalas();
+		salas = ss.listarSalas();
 	}
 	//metodos
 	public void novaSala() {
@@ -46,20 +49,41 @@ public class SalaControle implements Serializable {
 		
 	}
 	public void salvarNovaSala(){
-		sp.adicionarNovaSala(salaFoco);			
-		novaSala();
+		
+		if (nova) {
+			ss.salvarNovaSala(salaFoco);	
+		}else {
+			ss.atualizarSala(salaFoco);
+		}
+		novaSala();	
+		FacesContext facesContext = FacesContext.getCurrentInstance();	
+		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Sala salva com sucesso!", ""));
 		
 	}
 	
 	public void excluirSala() {
+		FacesContext facesContext = FacesContext.getCurrentInstance();	
 		if(salas.contains(salaFoco)) {
-			sp.deleteSala(salaFoco);			
-			sincronizarDados();
+			ss.deletarSala(salaFoco);	
 		}
-
 		novaSala();
+		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Sala excluida com sucesso!", ""));
+		
 	}
 	
+	public void cancelar() {
+		
+		novaSala();
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+	    try {
+			ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+			FacesContext context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Ação cancelada", ""));
+		} catch (IOException e) {
+			FacesContext context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, e.getLocalizedMessage(), ""));
+		}		
+	}
 		
 	//GETs e SETs
 	

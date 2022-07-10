@@ -38,7 +38,7 @@ public class Turma implements Serializable {
 	@JoinColumn(name = "id_sala")
 	private Sala sala;
 	
-	@ManyToMany(cascade = CascadeType.ALL)
+	@ManyToMany
 	@JoinTable(name="tbl_matriculas", uniqueConstraints = {@UniqueConstraint(columnNames = {"id_turma", "id_aluno"})}, joinColumns= {@JoinColumn(name="id_turma")}, inverseJoinColumns={@JoinColumn(name="id_aluno")})
 	private Collection<Aluno> alunos;
 

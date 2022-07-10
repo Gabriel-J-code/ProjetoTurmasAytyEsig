@@ -1,24 +1,29 @@
 package controle;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
-
+import javax.enterprise.context.SessionScoped;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import model.Aluno;
 import model.Professor;
 import model.Sala;
 import model.Turma;
-import percistencia.ProfessorPercistencia;
-import percistencia.SalaPercistencia;
-import percistencia.TurmaPercistencia;
+import percistencia.AlunoPercistencia;
+import servico.ProfessorServico;
+import servico.SalaServico;
+import servico.TurmaServico;
 
 @Named("turmaCon")
-@ApplicationScoped
+@SessionScoped
 public class TurmaControle implements Serializable {
 	
 	private Turma turmaFoco;
@@ -34,26 +39,26 @@ public class TurmaControle implements Serializable {
 	
 	private Collection<Turma> turmas;
 	
-	private TurmaPercistencia tp;
-	private ProfessorPercistencia pp;
-	private SalaPercistencia sp;
-	
+	private TurmaServico ts;
+	private ProfessorServico ps;
+	private SalaServico ss;
+		
 	public TurmaControle() {
 		
 	}	
 	
 	@PostConstruct
-	public void init() {
-		tp = new TurmaPercistencia();
-		pp = new ProfessorPercistencia();	
-		sp = new SalaPercistencia();
+	public void init() {		
+		ts = new TurmaServico();
+		ps = new ProfessorServico();
+		ss = new SalaServico();	
 		
 		novaTurma();		
 	}
 	
 		
 	public void sincronizarDados() {
-		turmas = tp.getTurmas();
+		turmas = ts.listarTurmas();
 	}
 	//metodos
 	public void novaTurma() {
@@ -66,14 +71,14 @@ public class TurmaControle implements Serializable {
 		
 	}
 	public void salvarNovaTurma(){
-		tp.adicionarNovaTurma(turmaFoco);			
+		ts.salvarTurma(turmaFoco); 		
 		novaTurma();
 		
 	}
 	
 	public void excluirTurma() {
 		if(turmas.contains(turmaFoco)) {
-			tp.deletarTurma(turmaFoco);			
+			ts.deletarTurma(turmaFoco);			
 		}
 		sincronizarDados();
 		novaTurma();
@@ -117,7 +122,8 @@ public class TurmaControle implements Serializable {
 
 			
 	public void removerAluno() {
-		tp.dematricularAlunoDeTurma(turmaFoco,alunoFoco);
+		AlunoPercistencia ap = new AlunoPercistencia();
+		ap.dematricularAlunoDeTurma(alunoFoco,turmaFoco);
 		sincronizarDados();
 	}
 	
@@ -177,34 +183,34 @@ public class TurmaControle implements Serializable {
 	}		
 	
 	public List<Professor> professoresDisponiveis() {
-		return pp.getProfessores();		
+		return ps.listarProfessores();		
 	}
 	
 	
 	public void cadastraProfessor() {		
 		removerProfessor();
-		tp.cadastrarProfessorATurma(professorFoco, turmaFoco);				
+		ts.cadastrarProfessorATurma(professorFoco, turmaFoco);				
 		mudarPodeMostrarProfessores();
 		sincronizarDados();
 	}
 	
 	public void removerProfessor() {
-		tp.removerProfessorDeTurma(turmaFoco);
+		ts.descastrarProfessor(turmaFoco);
 		sincronizarDados();
 	}
 	
 	public List<Sala> salasDisponiveis() {		
-		return sp.getSalas();		
+		return ss.listarSalas();		
 	}
 	
 	public void registrarSala() {
-		tp.cadastraSalaATurma(turmaFoco, salaFoco);
+		ts.cadastrarSala(turmaFoco, salaFoco);
 		sincronizarDados();
 		podeMostrarSalas = false;
 	}
 	
 	public void removerSala() {
-		tp.removerSalaDaTurma(turmaFoco);
+		ts.removerSala(turmaFoco);
 		sincronizarDados();
 	}
 	
@@ -212,11 +218,24 @@ public class TurmaControle implements Serializable {
 		if(existente) {
 			return "Atualização de Turma";
 		}else {
-			return "Cadatro de Nova Turma";
+			return "Cadastro de Nova Turma";
 		}
 		
 	}
 	
+public void cancelar() {
+		
+		novaTurma();;
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+	    try {
+			ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+			FacesContext context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Ação cancelada", ""));
+		} catch (IOException e) {
+			FacesContext context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, e.getLocalizedMessage(), ""));
+		}		
+	}	
 	
 	
 	

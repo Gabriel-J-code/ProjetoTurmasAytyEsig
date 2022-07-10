@@ -1,32 +1,41 @@
 package controle;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Date;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.SessionScoped;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import model.Aluno;
 import model.Genero;
 import model.Turma;
-import percistencia.AlunoPercistencia;
 import percistencia.TurmaPercistencia;
+import servico.AlunoServico;
 
 
 @Named("alunoCon")
-@ApplicationScoped
+
+@SessionScoped
 public class AlunoControle implements Serializable {
 	
 	
 	private Aluno alunoFoco;
+	
+
 	private boolean existente = false;
 	private boolean mostrarTurmasDisponiveis = false;
 	private Collection<Aluno> alunos;
 	private Turma turmaFoco;
 		
-	private AlunoPercistencia ap;
+	private AlunoServico as;
 	
 
 	public AlunoControle() {
@@ -35,20 +44,18 @@ public class AlunoControle implements Serializable {
 	
 	@PostConstruct
 	public void init() {	
-		
-		
-		ap = new AlunoPercistencia();
+		as = new AlunoServico();
 		sincronizarDados();
 		novoAluno();		
 	}
 	
 	@PreDestroy
 	public void exit() {
-	ap.fechar();
+	as.exit();;
 	}
 	
 	public void sincronizarDados() {
-		alunos = ap.getAlunos();
+		alunos = as.listarAlunos();
 	}
 	//metodos
 	public void novoAluno() {
@@ -57,18 +64,38 @@ public class AlunoControle implements Serializable {
 		sincronizarDados();
 		
 	}
-	public void salvarNovoAluno(){		
-		ap.adicionarNovoAluno(alunoFoco);	
+	public void salvarNovoAluno(){	
+			
+		as.salvarNovoAluno(alunoFoco);	
 		novoAluno();
+		FacesContext facesContext = FacesContext.getCurrentInstance();	
+		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aluno salvo com sucesso!", ""));
 		
 	}
 	
-	public void excluirAluno() {
+	public void excluirAluno() {		
 		if(alunos.contains(alunoFoco)) {
-			ap.deletarAluno(alunoFoco);
+			as.deletarAluno(alunoFoco);
 			sincronizarDados();
 		}
 		novoAluno();
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aluno excluido com sucesso!", ""));
+		
+	}
+	
+public void cancelar() {
+		
+		novoAluno();
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+	    try {
+			ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+			FacesContext context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Ação cancelada", ""));
+		} catch (IOException e) {
+			FacesContext context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, e.getLocalizedMessage(), ""));
+		}		
 	}
 	
 	public Genero[] generos() {
@@ -81,13 +108,13 @@ public class AlunoControle implements Serializable {
 		
 	}
 	
-	public void removerTurma() {
-		alunoFoco = ap.dematricularAlunoDeTurma(alunoFoco, turmaFoco);
-		sincronizarDados();
+	public void removerTurma() {		
+		alunoFoco = as.desmatricularAlunoDeTurma(alunoFoco, turmaFoco);
+		sincronizarDados();		
 	}
 	
 	public void matricularAlunoATurma() {
-		ap.matricularAlunoATurma(alunoFoco, turmaFoco);
+		as.matricularAlunoATurma(alunoFoco, turmaFoco);
 		sincronizarDados();
 	}
 	
@@ -155,11 +182,24 @@ public class AlunoControle implements Serializable {
 		}		
 	}
 	
-	
-	
-	
-	
-	
-	
+	@SuppressWarnings("deprecation")
+	public int getIdadeAlunoFoco() {
+		if(alunoFoco.getData_de_nascimento()==null) {
+			return -1;
+		}
+		Date nascimento = alunoFoco.getData_de_nascimento();
+		Date now = new Date(System.currentTimeMillis());
+		int idade =  now.getYear() - nascimento.getYear();	
+		if (nascimento.getMonth() > now.getMonth()) {
+			idade--;			
+		} else {
+			if (nascimento.getMonth() == now.getMonth()) {
+				if(nascimento.getDate() > now.getDate()) {
+					idade--;					
+				}
+			}
+		}
+		return idade;
+	}
 
 }
