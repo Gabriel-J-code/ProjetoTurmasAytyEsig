@@ -6,19 +6,16 @@ import model.Turma;
 import model.Professor;
 import model.Sala;
 import percistencia.AlunoPercistencia;
-import percistencia.ProfessorPercistencia;
 import percistencia.TurmaPercistencia;
 
 public class TurmaServico {
 	private TurmaPercistencia tp;
 	private AlunoPercistencia ap;
-	private ProfessorPercistencia pp;
 	
 		
 	public TurmaServico() {
 		tp = new TurmaPercistencia();
-		ap = new AlunoPercistencia();
-		pp = new ProfessorPercistencia();		
+		ap = new AlunoPercistencia();	
 		
 	}
 	

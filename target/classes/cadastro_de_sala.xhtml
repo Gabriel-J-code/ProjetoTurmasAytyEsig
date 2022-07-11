@@ -6,14 +6,10 @@
 	xmlns:p="http://primefaces.org/ui"> <ui:composition
 	template="/estrutura.xhtml">
 	<ui:param name="titulo" value="Cadastro de Sala" />
-	<ui:define name="direita">
-		<h:messages infoClass="info" errorClass="erro" warnClass="warn"
-			fatalClass="fatal" />
-	</ui:define>
-
 	<h1>#{salaCon.titulo()}</h1>
 	<h:form>
-		<h:message />
+		<h:messages infoClass="info" errorClass="erro" warnClass="warn"
+			fatalClass="fatal" />
 		<h:panelGrid columnClasses="titleCamp, inputCamp, messageCamp"
 			columns="3">
 

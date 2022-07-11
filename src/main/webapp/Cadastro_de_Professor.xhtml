@@ -3,29 +3,26 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:p="http://primefaces.org/ui">
-	
-	 <ui:composition
+	xmlns:p="http://primefaces.org/ui"> <ui:composition
 	template="/estrutura.xhtml">
 	<ui:param name="titulo" value="Cadastro de Professor" />
-	<ui:define name="direita">
-		<h:messages infoClass="info" errorClass="erro" warnClass="warn"
-			fatalClass="fatal" />
-	</ui:define>
-
 	<h1>#{professorCon.titulo()}</h1>
 	<h:form>
+	<h:messages infoClass="info" errorClass="erro" warnClass="warn"
+			fatalClass="fatal" />
 		<h:panelGrid columnClasses="titleCamp, inputCamp, messageCamp"
 			columns="3">
 
 			<h:outputLabel for="nome" value="Nome: " />
-			<p:inputText id="nome" value="#{professorCon.professorFoco.nome}" />
+			<p:inputText id="nome" value="#{professorCon.professorFoco.nome}" 
+					size="50"/>
 			<h:message for="name" />
 
 						
 			<h:outputLabel for="nascimento" value="Data de Nascimento: " />
 			<h:form>
-			<p:inputMask id="nascimento" value="#{professorCon.professorFoco.data_de_nascimento}" mask="99/99/9999">
+			<p:inputMask id="nascimento" value="#{professorCon.professorFoco.data_de_nascimento}" 
+					mask="99/99/9999" size="8">
 				<f:convertDateTime pattern="dd/MM/yyyy"/>
 			</p:inputMask>	
 			<p:outputLabel value="Idade: #{professorCon.idadeProfessorFoco} anos" rendered="#{professorCon.idadeProfessorFoco > -1}"/>
@@ -33,12 +30,14 @@
 			<h:message for="nascimento" />
 
 			<h:outputLabel for="email" value="Email: " />
-			<p:inputText id="email" value="#{professorCon.professorFoco.email}"/>			
+			<p:inputText id="email" value="#{professorCon.professorFoco.email}"
+			size="50"/>			
 			<h:message for="email" />
 
 			<h:outputLabel for="formacao" value="Formação: " />
 			<p:inputText id="formacao"
-				value="#{professorCon.professorFoco.formacao}" />
+				value="#{professorCon.professorFoco.formacao}" 
+				size="50"/>
 			<h:message for="formacao" />
 
 			<h:outputLabel for="genero" value="Genero: " />

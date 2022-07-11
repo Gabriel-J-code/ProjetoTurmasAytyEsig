@@ -28,11 +28,8 @@ public class ProfessorServico {
 		tp.atualizarTurma(turma);
 	}
 	
-	public void desmatricularProfessor(Professor professor,Turma turma) {
-		professor.getTurmasMinistradas().remove(turma);
-		turma.setProfessor(new Professor());
-		pp.atualizarProfessor(professor);
-		tp.atualizarTurma(turma);
+	public void desmatricularProfessor(Professor professor,Turma turma) {		
+		pp.removerProfessorDaTurma(professor, turma);
 		
 	}
 	

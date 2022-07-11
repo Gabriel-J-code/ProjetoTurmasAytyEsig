@@ -5,15 +5,11 @@
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:p="http://primefaces.org/ui"> <ui:composition
 	template="/estrutura.xhtml">
-	<ui:param name="titulo" value="Cadastro de Turma" />
-	<ui:define name="direita">
-		<h:messages infoClass="info" errorClass="erro" warnClass="warn"
-			fatalClass="fatal" />
-	</ui:define>
-
+	<ui:param name="titulo" value="Cadastro de Turma" />	
 	<h1>#{turmaCon.titulo()}</h1>
 	<h:form>
-		<h:messages />
+	<h:messages infoClass="info" errorClass="erro" warnClass="warn"
+			fatalClass="fatal" />	
 		<h:panelGrid columnClasses="titleCamp, inputCamp, messageCamp"
 			columns="3">
 

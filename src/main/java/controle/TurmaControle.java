@@ -53,10 +53,11 @@ public class TurmaControle implements Serializable {
 		ps = new ProfessorServico();
 		ss = new SalaServico();	
 		
+		sincronizarDados();
 		novaTurma();		
 	}
 	
-		
+	
 	public void sincronizarDados() {
 		turmas = ts.listarTurmas();
 	}
